@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>Starter Page | Velonic - Bootstrap 5 Admin & Dashboard Template</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="A fully responsive admin theme which can be used to build CRM, CMS,ERP etc." name="description" />
+        <meta content="Techzaa" name="author" />
+
+        
+        {{ include('admin/partials/_style.html.twig') }}
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+
+    <body>
+        <!-- Begin page -->
+        <div class="wrapper">
+            <!-- ========== Topbar Start ========== -->
+            {{ include('admin/partials/_navbar.html.twig') }}
+            <!-- ========== Topbar End ========== -->
+
+            <!-- ========== Left Sidebar Start ========== -->
+            {{ include('admin/partials/_sidebar.html.twig') }}
+            <!-- ========== Left Sidebar End ========== -->
+
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+
+            <div class="content-page">
+                <div class="content">
+                    <!-- Start Content-->
+                    <div class="container-fluid">
+                        <!-- start page title -->
+                        {% block title %}{% endblock title %}
+                        <!-- end page title -->
+                    </div> <!-- container -->
+                    {% block body %}{% endblock body %}
+                </div> <!-- content -->
+
+                <!-- Footer Start -->
+                {{ include('admin/partials/_footer.html.twig') }}
+                <!-- end Footer -->
+            </div>
+        </div>
+        <!-- END wrapper -->
+
+        <!-- Theme Settings -->
+        {{ include('admin/partials/_theme.html.twig') }}
+        <!-- Script js -->
+        {{ include('admin/partials/_script.html.twig') }}
+        
+    </body>
+</html>

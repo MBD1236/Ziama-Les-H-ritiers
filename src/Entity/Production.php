@@ -40,10 +40,20 @@ class Production
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'production')]
     private Collection $commandes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $codeProduction = null;
+
+    /**
+     * @var Collection<int, Cadeau>
+     */
+    #[ORM\OneToMany(targetEntity: Cadeau::class, mappedBy: 'production')]
+    private Collection $cadeaux;
+
     public function __construct()
     {
         $this->productionEmployes = new ArrayCollection();
         $this->commandes = new ArrayCollection();
+        $this->cadeaux = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,6 +163,48 @@ class Production
             // set the owning side to null (unless already changed)
             if ($commande->getProduction() === $this) {
                 $commande->setProduction(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCodeProduction(): ?string
+    {
+        return $this->codeProduction;
+    }
+
+    public function setCodeProduction(?string $codeProduction): static
+    {
+        $this->codeProduction = $codeProduction;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cadeau>
+     */
+    public function getCadeaux(): Collection
+    {
+        return $this->cadeaux;
+    }
+
+    public function addCadeau(Cadeau $cadeau): static
+    {
+        if (!$this->cadeaux->contains($cadeau)) {
+            $this->cadeaux->add($cadeau);
+            $cadeau->setProduction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCadeau(Cadeau $cadeau): static
+    {
+        if ($this->cadeaux->removeElement($cadeau)) {
+            // set the owning side to null (unless already changed)
+            if ($cadeau->getProduction() === $this) {
+                $cadeau->setProduction(null);
             }
         }
 

@@ -5,39 +5,38 @@ namespace App\Repository;
 use App\Entity\ProductionEmploye;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @extends ServiceEntityRepository<ProductionEmploye>
  */
 class ProductionEmployeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private PaginatorInterface $paginator)
     {
         parent::__construct($registry, ProductionEmploye::class);
     }
 
-    //    /**
-    //     * @return ProductionEmploye[] Returns an array of ProductionEmploye objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
 
-    //    public function findOneBySomeField($value): ?ProductionEmploye
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function paginateProductionEmployesWithSearch(string $query, int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->createQueryBuilder('p')
+            ->innerJoin('p.user', 'u')
+            ->innerJoin('p.production', 'production')
+            ->where('u.username LIKE :query OR production.codeProduction LIKE :query')
+            ->setParameter('query', '%'.$query.'%'),
+            $page,
+            2
+        );
+    }
+    public function paginateProductionEmployes(int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->createQueryBuilder('p'),
+            $page,
+            2
+        );
+    }
 }

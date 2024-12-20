@@ -1,0 +1,80 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Commandes</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Liste des commandes</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <div>
+                    <form action="{{ path('app_admin_commande_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                        <input class="form-control" placeholder="Rechercher" name="recherche" value="{{ query ?? '' }}">
+                        <button class="btn btn-primary"><span class="bi bi-search"></span></button>
+                    </form>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_commande_new')}}" class="btn btn-primary">Enregistrer une commande</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Commande</th>
+                                <th>Client</th>
+                                <th>Production</th>
+                                <th>Quantité</th>
+                                <th>Montant</th>
+                                <th>Paiement</th>
+                                <th>Date</th>
+                                <th>Employé</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k, c in commandes  %}
+                                <tr>
+                                    <td>{{ k+1 }}</td>
+                                    <td>{{ c.codeCommande }}</td>
+                                    <td>{{ c.client.nom }} - {{ c.client.telephone }}</td>
+                                    <td>{{ c.production.codeProduction }}</td>
+                                    <td>{{ c.quantite }}</td>
+                                    <td class="fw-bold">{{ c.montantTotal }} GNF</td>
+                                    <td>{{ c.modePaiement }}</td>
+                                    <td>{{ c.dateCommande|date('Y-m-d H:i')}}</td>
+                                    <td>{{ c.user.username }}</td>
+                                    {% if c.statut == 'Non réglé' %}
+                                    <td class="fw-bold" style="color:red">{{ c.statut }}</td>
+                                    {% else %}
+                                    <td class="fw-bold">{{ c.statut }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <a href="{{ path('app_admin_commande_edit', {'id': c.id}) }}" class="bi-pencil"></a>
+                                        <a href="{{ path('app_admin_commande_facture', {'id': c.id}) }}" class="bi-eye" title="Voir la facture"></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+                {{ knp_pagination_render(commandes) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

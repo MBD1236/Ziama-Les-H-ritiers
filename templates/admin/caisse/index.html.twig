@@ -1,0 +1,69 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Caisses</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Liste des transactions de la caisse</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <div>
+                    <form action="{{ path('app_admin_caisse_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                        <input class="form-control" placeholder="Rechercher" name="recherche" value="{{ query ?? '' }}">
+                        <button class="btn btn-primary"><span class="bi bi-search"></span></button>
+                    </form>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_caisse_new')}}" class="btn btn-primary">Enregistrer une livraison</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Montant</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k, c in caisses %}
+                                <tr>
+                                    <td>{{ k+1 }}</td>
+                                    <td>{{ c.montant}}</td>
+                                    <td>{{ c.type }}</td>
+                                    <td>{{ c.description }}</td>
+                                    <td>{{ c.date|date('Y-m-d') }}</td>
+                                    <td class="d-flex gap-2 justify-content-end w-100">
+                                        <a href="{{ path('app_admin_caisse_edit', {'id': c.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
+                                        <form action="{{ path('app_admin_caisse_delete', {'id': c.id}) }}" method="post">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="btn btn-danger btn-sm bi-trash"></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+                {{ knp_pagination_render(caisses) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

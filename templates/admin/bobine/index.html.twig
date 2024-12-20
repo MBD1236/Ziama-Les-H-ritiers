@@ -1,0 +1,103 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Bobines</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Liste des bobines</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <div>
+                    <form action="{{ path('app_admin_bobine_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                        <input class="form-control" placeholder="Rechercher" name="recherche" value="{{ query ?? '' }}">
+                        <button class="btn btn-primary"><span class="bi bi-search"></span></button>
+                    </form>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_bobine_new')}}" class="btn btn-primary">Enregistrer une livraison</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="text-center">
+                                <th>N°</th>
+                                <th>Type</th>
+                                <th>Quantité en Stock</th>
+                                <th>Prix Unitaire</th>
+                                <th>Etat du stock</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k, b in bobines %}
+                                <tr class="text-center">
+                                    <td>{{ k+1 }}</td>
+                                    <td>{{ b.type }}</td>
+                                    <td class="fw-bold">{{ b.quantiteStock }}</td>
+                                    <td>{{ b.prixUnitaire}}</td>
+                                    {% if b.quantiteStock < 10 %}
+                                        <td><span class="badge bg-danger">Faible</span></td>
+                                    {% else %}
+                                        <td><span class="badge bg-success">Bon</span></td>
+                                    {% endif %}
+                                    <td class="d-flex justify-content-center gap-1 align-items-center">
+                                        <a href="{{ path('app_admin_bobine_edit', {'id': b.id}) }}" class="bi-pencil" title="Modifier cette bobine"></a>
+                                        <a type="button" class="badge bg-primary bi-plus" title="Augmenter le stock" data-bs-toggle="modal" data-bs-target="#primary-header-modal-{{ k }}">Augmenter le stock</a>
+                                        <a href="{{ path('app_admin_bobine_mouvement_bobine', {'id': b.id}) }}" class="bi-eye" title="Voir les entrées et sorties de cette bobine"></a>
+                                    </td>
+                                    <!-- Modal pour l'ajout du stock -->
+                                    <div id="primary-header-modal-{{ k }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="primary-header-modalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header modal-colored-header bg-primary">
+                                                    <h4 class="modal-title" id="primary-header-modalLabel">Ajout du stock de la bobine de type {{ b.type }}</h4>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ path('app_admin_bobine_ajout_stock', {'id': b.id}) }}" method="POST" id="modal-form">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <label for="form-label">Quantité a augmenter</label>
+                                                                <input type="number" class="form-control" name="quantite">
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="form-label">Prix Unitaire</label>
+                                                                <input type="number" class="form-control" name="prixUnitaire">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                                                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal -->
+                                </tr>
+                            {% endfor %}
+                            
+                        </tbody>
+                </table>
+                {{ knp_pagination_render(bobines) }}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

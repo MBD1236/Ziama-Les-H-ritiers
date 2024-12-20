@@ -3,41 +3,56 @@
 namespace App\Repository;
 
 use App\Entity\Livraison;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @extends ServiceEntityRepository<Livraison>
  */
 class LivraisonRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private PaginatorInterface $paginator)
     {
         parent::__construct($registry, Livraison::class);
     }
 
-    //    /**
-    //     * @return Livraison[] Returns an array of Livraison objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function countLivraisonsByMonth($year, $month): int
+    {
+        
+        $startDate = new DateTime("$year-$month-01 00:00:00");
+        $endDate = new DateTime("$year-$month-31 23:59:59");
 
-    //    public function findOneBySomeField($value): ?Livraison
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return  $this->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
+            ->where('l.dateLivraison BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+
+    public function paginateLivraisonsWithSearch(string $query, int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->createQueryBuilder('l')
+            ->innerJoin('l.commande', 'c')
+            ->innerJoin('l.user', 'u')
+            ->where('c.codeCommande LIKE :query OR u.username LIKE :query')
+            ->setParameter('query', '%'.$query.'%'),
+            $page,
+            2
+        );
+    }
+    public function paginateLivraisons(int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->createQueryBuilder('l'),
+            $page,
+            2
+        );
+    }
 }

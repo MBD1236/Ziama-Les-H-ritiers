@@ -33,9 +33,16 @@ class Client
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'client')]
     private Collection $commandes;
 
+    /**
+     * @var Collection<int, Cadeau>
+     */
+    #[ORM\OneToMany(targetEntity: Cadeau::class, mappedBy: 'client')]
+    private Collection $cadeaux;
+
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->cadeaux = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -115,6 +122,36 @@ class Client
             // set the owning side to null (unless already changed)
             if ($commande->getClient() === $this) {
                 $commande->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cadeau>
+     */
+    public function getCadeaux(): Collection
+    {
+        return $this->cadeaux;
+    }
+
+    public function addCadeaux(Cadeau $cadeaux): static
+    {
+        if (!$this->cadeaux->contains($cadeaux)) {
+            $this->cadeaux->add($cadeaux);
+            $cadeaux->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCadeaux(Cadeau $cadeaux): static
+    {
+        if ($this->cadeaux->removeElement($cadeaux)) {
+            // set the owning side to null (unless already changed)
+            if ($cadeaux->getClient() === $this) {
+                $cadeaux->setClient(null);
             }
         }
 

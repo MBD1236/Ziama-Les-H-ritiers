@@ -1,0 +1,37 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Modification</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Modification des depenses</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="header-title">Modification d'une depense</h4>
+            </div>
+            <div class="card-body">
+                {{form_start(form)}}
+                <div class="row">
+                    <div class="col-md-6">{{ form_row(form.type) }}</div>
+                    <div class="col-md-6">{{ form_row(form.montant) }}</div>
+                    <div class="col-md-6">{{ form_row(form.description) }}</div>
+                    <div class="col-md-6">{{ form_row(form.dateDepense) }}</div>
+                </div>
+                {{form_end(form)}}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

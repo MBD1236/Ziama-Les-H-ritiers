@@ -1,0 +1,62 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Mouvement Bobine</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Liste des entrées et sorties de la bobine</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Bobine</th>
+                                <th>Type de mouvement</th>
+                                <th>Quantité</th>
+                                <th>Prix Unitaire</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k, m in mouvementsBobine %}
+                                <tr>
+                                    <td>{{ k+1 }}</td>
+                                    <td>{{ m.bobine.type }}</td>
+                                    {% if m.typeMouvement == 'sortie' %}
+                                    <td class="fw-bold" style="color:red">
+                                        {{ m.typeMouvement }}
+                                    </td>
+                                    {% else %}
+                                    <td class="fw-bold" style="color:blue">
+                                        {{ m.typeMouvement }}
+                                    </td>
+                                    {% endif %}
+
+                                    <td>{{ m.quantite }}</td>
+                                    <td>{{ m.prixUnitaire }}</td>
+                                    <td>{{ m.date|date('Y-m-d')}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+                {{ knp_pagination_render(mouvementsBobine) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

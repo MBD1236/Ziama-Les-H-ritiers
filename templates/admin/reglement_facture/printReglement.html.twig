@@ -1,0 +1,53 @@
+{% extends "printLayout/base.html.twig" %}
+{% block body %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    
+</style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2 class="mb-1">Groupe Mandela</h2>
+                <h3>Reçu de paiement</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Date :</strong> {{ r.date|date('d/m/Y') }}</p>
+                <p><strong>Client :</strong> {{ r.facture.commande.client.nom }} - {{ r.facture.commande.client.telephone }}</p>
+
+                <table class="table table-bordered mt-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Facture</th>
+                            <th>Montant Réglé</th>
+                            <th>Mode de paiement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{r.facture.codeFacture }}</td>
+                            <td class="text-end">{{ r.montantRegle|number_format(2, ',', ' ') }} GNF</td>
+                            <td class="text-end">{{ r.modeReglement }}</td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-4">
+                    <p><strong>Total Montant :</strong> {{ r.montantRegle|number_format(2, ',', ' ') }} GNF</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<script>
+    window.onload = function() {
+        window.print();
+    }
+</script>
+{% endblock body %}

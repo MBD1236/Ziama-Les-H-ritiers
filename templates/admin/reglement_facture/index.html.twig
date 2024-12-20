@@ -1,0 +1,63 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Réglement Factures</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Les réglements des factures</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <div>
+                    <form action="{{ path('app_admin_reglement_facture_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                        <input class="form-control" placeholder="Rechercher" name="recherche" value="{{ query ?? '' }}">
+                        <button class="btn btn-primary"><span class="bi bi-search"></span></button>
+                    </form>
+                </div>
+                
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Facture</th>
+                                <th>Mode réglement</th>
+                                <th>Montant réglé</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k, r in reglements %}
+                            <tr>
+                                <td>{{ k+1 }}</td>
+                                <td>{{ r.facture.codeFacture }}</td>
+                                <td>{{ r.modeReglement }}</td>
+                                <td>{{ r.montantRegle }}</td>
+                                <td>{{ r.date|date('Y-m-d') }}</td>
+                                <td>
+                                    <a type="button" href="{{ path('app_admin_reglement_impression', {'id': r.id}) }}" class="btn btn-primary btn-sm"><span class="bi bi-printer" title="Imprimer le recu"></span></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+                {{ knp_pagination_render(reglements) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

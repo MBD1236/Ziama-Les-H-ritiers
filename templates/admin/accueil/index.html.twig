@@ -1,0 +1,109 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Accueil</a></li>
+                    <li class="breadcrumb-item active">Tableau de bord</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Accueil</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat text-bg-pink">
+            <div class="card-body">
+                <div class="float-end">
+                    <i class="ri-user-line widget-icon"></i>
+                </div>
+                <h6 class="text-uppercase mt-0" title="Customers">Clients</h6>
+                <h2 class="my-2">{{ clients }}</h2>
+            </div>
+        </div>
+    </div> <!-- end col-->
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat text-bg-purple">
+            <div class="card-body">
+                <div class="float-end">
+                    <i class="ri-wallet-2-line widget-icon"></i>
+                </div>
+                <h6 class="text-uppercase mt-0" title="Customers">Caisse</h6>
+                <h2 class="my-2">{{ caisses }}GNF</h2>
+                
+            </div>
+        </div>
+    </div> <!-- end col-->
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat text-bg-info">
+            <div class="card-body">
+                <div class="float-end">
+                    <i class="ri-shopping-basket-line widget-icon"></i>
+                </div>
+                <h6 class="text-uppercase mt-0" title="Customers">Commandes</h6>
+                <h2 class="my-2">{{ commandes }}</h2>
+            </div>
+        </div>
+    </div> <!-- end col-->
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat text-bg-primary">
+            <div class="card-body">
+                <div class="float-end">
+                    <i class="ri-group-2-line widget-icon"></i>
+                </div>
+                <h6 class="text-uppercase mt-0" title="Customers">Employés</h6>
+                <h2 class="my-2">{{ employes }}</h2>
+                
+            </div>
+        </div>
+    </div> <!-- end col-->
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+            <h5 class="text-center mt-2">Nombre des commandes, productions et livraisons</h5>
+        
+            </div>
+            <div class="card-body">
+                {{ render_chart(chart) }}
+            </div>
+        </div>
+    </div> <!-- end col-->
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+            <h5 class="text-center mt-2">Somme des commandes, depenses et transaction fournisseurs</h5>
+        
+            </div>
+            <div class="card-body">
+                {{ render_chart(chart2) }}
+
+            </div>
+        </div>
+
+    </div> <!-- end col-->
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+                <h5 class="text-center mt-2">Somme des commandes, depenses et transaction fournisseurs</h5>
+        
+            </div>
+            <div class="card-body">
+                {{ render_chart(chart3) }}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end row -->
+{% endblock body %}

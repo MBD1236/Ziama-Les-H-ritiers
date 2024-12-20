@@ -15,24 +15,30 @@ class Caisse
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $montantEncaisse = null;
+    private ?int $montant = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $description = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMontantEncaisse(): ?int
+    public function getMontant(): ?int
     {
-        return $this->montantEncaisse;
+        return $this->montant;
     }
 
-    public function setMontantEncaisse(int $montantEncaisse): static
+    public function setMontant(int $montant): static
     {
-        $this->montantEncaisse = $montantEncaisse;
+        $this->montant = $montant;
 
         return $this;
     }
@@ -45,6 +51,30 @@ class Caisse
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

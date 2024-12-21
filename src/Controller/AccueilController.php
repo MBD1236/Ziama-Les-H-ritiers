@@ -81,22 +81,22 @@ class AccueilController extends AbstractController
             'datasets' => [
                 [
                     'label' => 'Commandes',
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
+                    'backgroundColor' => 'rgba(0, 255, 0, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
                     'data' => $dataCommandes, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Productions',
-                    'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
+                    'backgroundColor' => 'rgba(0, 0, 255, 0.4)',
                     'borderColor' => 'rgba(70, 123, 235, 1)',
                     'data' => $dataProductions, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Livraisons',
-                    'backgroundColor' => 'rgba(54, 29, 200, 0.4)',
-                    'borderColor' => 'rgba(54, 29, 200, 1)',
+                    'backgroundColor' => 'rgba(255, 0, 0, 0.4)',
+                    'borderColor' => 'rgba(255, 0, 0, 1)',
                     'data' => $dataLivraisons, // Les données dynamiques
                     'tension' => 0.4,
                 ],
@@ -127,7 +127,7 @@ class AccueilController extends AbstractController
                 [
                     'label' => 'Dépenses',
                     'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
-                    'borderColor' => 'rgba(70, 123, 235, 1)',
+                    'borderColor' => 'rgba(255, 0, 0, 0.4)',
                     'data' => $dataDepenses, // Les données dynamiques
                     'tension' => 0.4,
                 ],

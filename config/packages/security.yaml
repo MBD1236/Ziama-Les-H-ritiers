@@ -16,6 +16,15 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                success_handler: App\Security\AuthenticationSuccessHandler # Utilise le service créé
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: app_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -26,7 +35,18 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/livraison, roles: [ROLE_ADMIN, ROLE_LIVREUR] }
+        - { path: ^/production/employe, roles: [ROLE_ADMIN, ROLE_PRODUCTEUR] }
+        - { path: ^/admin/accueil, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
+        - { path: ^/admin/accueil, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
+        - { path: ^/depense, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
+        - { path: ^/transaction/fournisseur, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
+        - { path: ^/caisse, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
+        - { path: ^/admin/cadeau, roles: [ROLE_ADMIN] }
+        - { path: ^/admin/bobine, roles: [ROLE_ADMIN] }
+        - { path: ^/admin/client, roles: [ROLE_ADMIN] }
+        - { path: ^/admin/facture, roles: [ROLE_ADMIN] }
+        - { path: ^/admin/reglement, roles: [ROLE_ADMIN] }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

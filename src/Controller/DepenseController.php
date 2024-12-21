@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/depense')]
+#[Route('/depense')]
 class DepenseController extends AbstractController
 {
     #[Route('/', name: 'app_admin_depense_index', methods:['GET'])]

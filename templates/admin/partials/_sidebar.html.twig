@@ -1,7 +1,7 @@
 <div class="leftside-menu">
 
     <!-- Brand Logo Light -->
-    <a href="index.html" class="logo logo-light">
+    <a href="{{ path('app_admin_accueil_index') }}" class="logo logo-light">
         <h3 class="logo-lg mt-3">Groupe Mandela</h3>
     </a>
     
@@ -12,15 +12,31 @@
         <!--- Sidemenu -->
         <ul class="side-nav">
 
+            {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-title">Administration</li>
+            {% endif %}
+            {% if is_granted('ROLE_COMPTABLE') %}
+            <li class="side-nav-title">Comptabilité</li>
+            {% endif %}
+            {% if is_granted('ROLE_LIVREUR') %}
+            <li class="side-nav-title">Livraison</li>
+            {% endif %}
+            {% if is_granted('ROLE_PRODUCTEUR') %}
+            <li class="side-nav-title">Production</li>
+            {% endif %}
+            
 
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COMPTABLE') %}
             <li class="side-nav-item">
                 <a href="{{ path('app_admin_accueil_index' )}}" class="side-nav-link">
                     <i class="ri-dashboard-3-line"></i>
                     <span class="badge bg-success float-end"></span>
                     <span> Tableau de bord </span>
                 </a>
-            </li>
+            </li>   
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesBobine" aria-expanded="false" aria-controls="sidebarPagesBobine" class="side-nav-link">
                     <i class="ri-layout-line"></i>
@@ -38,6 +54,9 @@
                     </ul>
                   </div>
             </li>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRODUCTEUR') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesProduction" aria-expanded="false" aria-controls="sidebarPagesProduction" class="side-nav-link">
                     <i class="ri-briefcase-line"></i>
@@ -46,6 +65,7 @@
                 </a>
                 <div class="collapse" id="sidebarPagesProduction">
                     <ul class="side-nav-second-level">
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li>
                             <a href="{{ path('app_admin_production_new') }}">Ajouter une production</a>
                         </li>
@@ -53,14 +73,21 @@
                             <a href="{{ path('app_admin_production_index') }}">Liste des productions</a>
                         </li>
                         <li>
-                            <a href="{{ path('app_admin_production_employe_index') }}">Production des employes</a>
-                        </li>
-                        <li>
                             <a href="{{ path('app_admin_cadeau_index') }}">Cadeaux des clients</a>
                         </li>
+                        {% endif %}
+
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRODUCTEUR') %}
+                            <li>
+                                <a href="{{ path('app_admin_production_employe_index') }}">Production des employes</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </li>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesClient" aria-expanded="false" aria-controls="sidebarPagesClient" class="side-nav-link">
                     <i class="ri-account-pin-circle-line"></i>
@@ -78,6 +105,8 @@
                     </ul>
                 </div>
             </li>
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LIVREUR') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesCommande" aria-expanded="false" aria-controls="sidebarPagesCommande" class="side-nav-link">
                     <i class="ri-shopping-bag-line"></i>
@@ -86,19 +115,25 @@
                 </a>
                 <div class="collapse" id="sidebarPagesCommande">
                     <ul class="side-nav-second-level">
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li>
                             <a href="{{ path('app_admin_commande_new') }}">Ajouter une commande</a>
                         </li>
                         <li>
                             <a href="{{ path('app_admin_commande_index') }}">Liste des commandes</a>
                         </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LIVREUR') %}
                         <li>
                             <a href="{{ path('app_admin_livraison_index') }}">Livraisons des commandes</a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </li>
-            
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesFacture" aria-expanded="false" aria-controls="sidebarPagesFacture" class="side-nav-link">
                     <i class="ri-bank-card-line"></i>
@@ -116,7 +151,9 @@
                     </ul>
                 </div>
             </li>
+            {% endif %}
 
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COMPTABLE') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesDepense" aria-expanded="false" aria-controls="sidebarPagesDepense" class="side-nav-link">
                     <i class="ri-wallet-line"></i>
@@ -134,7 +171,9 @@
                     </ul>
                 </div>
             </li>
+            {% endif %}
 
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COMPTABLE') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesFournisseur" aria-expanded="false" aria-controls="sidebarPagesFournisseur" class="side-nav-link">
                     <i class="ri-group-line"></i>
@@ -143,19 +182,26 @@
                 </a>
                 <div class="collapse" id="sidebarPagesFournisseur">
                     <ul class="side-nav-second-level">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            
                         <li>
                             <a href="{{ path('app_admin_fournisseur_new') }}">Ajouter un fournisseur</a>
                         </li>
                         <li>
                             <a href="{{ path('app_admin_fournisseur_index') }}">Liste des fournisseurs</a>
                         </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COMPTABLE') %}
                         <li>
                             <a href="{{ path('app_admin_transaction_fournisseur_index') }}">Transaction fournisseurs</a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </li>
+            {% endif %}
 
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COMPTABLE') %}
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarPagesCaisse" aria-expanded="false" aria-controls="sidebarPagesCaisse" class="side-nav-link">
                     <i class="ri-bank-card-2-line"></i>
@@ -175,6 +221,7 @@
                     </ul>
                 </div>
             </li>
+            {% endif %}
         </ul>
         <!--- End Sidemenu -->
 

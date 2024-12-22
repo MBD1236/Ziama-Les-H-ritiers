@@ -22,9 +22,9 @@ class FactureRepository extends ServiceEntityRepository
     public function paginateFactures(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('f'),
+            $this->createQueryBuilder('f')->orderBy('f.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 
@@ -33,10 +33,10 @@ class FactureRepository extends ServiceEntityRepository
         return $this->paginator->paginate(
             $this->createQueryBuilder('f')
             ->innerJoin('f.commande', 'c')
-            ->where('f.codeFacture LIKE :query OR c.codeCommande LIKE :query OR f.statut LIKE :query OR f.montantRegle LIKE :query OR f.montantRestant LIKE :query OR f.codeFacture LIKE :query')
+            ->where('f.codeFacture LIKE :query OR c.codeCommande LIKE :query OR f.statut LIKE :query OR f.montantRegle LIKE :query OR f.montantRestant LIKE :query OR f.codeFacture LIKE :query')->orderBy('f.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            2
+            15
         );
     }
 }

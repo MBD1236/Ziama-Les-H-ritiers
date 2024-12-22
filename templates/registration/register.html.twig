@@ -1,0 +1,49 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Enregistrement</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Enregistrement des employés</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="header-title">Ajout d'une employé</h4>
+            </div>
+            <div class="card-body">
+                {{ form_errors(registrationForm) }}
+                {{ form_start(registrationForm) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.username) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.email) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.type) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.plainPassword, {
+                            label: 'Mot de passe'
+                        }) }}
+                    </div>
+                </div>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

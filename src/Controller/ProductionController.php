@@ -96,6 +96,20 @@ class ProductionController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_admin_production_delete', methods: ['DELETE'])]
+    public function delete(Production $production, EntityManagerInterface $em): Response
+    {
+        try {
+            $em->remove($production);
+            $em->flush();
+            $this->addFlash('success', 'Le production a bien été supprimée.');
+            return $this->redirectToRoute('app_admin_production_index');
+        } catch (\Throwable $th) {
+            $this->addFlash('danger', 'Erreur de suppression.');
+            return $this->redirectToRoute('app_admin_production_index');
+        }
+    }
+
     #[Route('/search', name: 'app_admin_production_search', methods:['GET'])]
     public function search(Request $request, ProductionRepository $productionRepository): Response
     {

@@ -21,9 +21,12 @@ class BobineType extends AbstractType
                 'choices' => [
                     'Sélectionner le type de bobine' => null,
                     '10Kg' => '10Kg',
+                    '15Kg' => '15Kg',
                     '18Kg' => '18Kg',
                     '20Kg' => '20Kg',
                     '25Kg' => '25Kg',
+                    '30Kg' => '30Kg',
+                    '35Kg' => '35Kg',
                 ],
             ])
             ->add('quantiteStock', IntegerType::class, [

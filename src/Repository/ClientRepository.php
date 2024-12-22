@@ -30,20 +30,20 @@ class ClientRepository extends ServiceEntityRepository
     public function paginateClients(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('c'),
+            $this->createQueryBuilder('c')->orderBy('c.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
     public function paginateWithSearch(string $query, int $page): PaginationInterface
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('c')
-                ->where('c.nom LIKE :query OR c.adresse LIKE :query OR c.telephone LIKE :query OR c.typeClient LIKE :query')
+                ->where('c.nom LIKE :query OR c.adresse LIKE :query OR c.telephone LIKE :query OR c.typeClient LIKE :query')->orderBy('c.id', 'DESC')
                 ->setParameter('query', '%'.$query.'%')
             ,
             $page,
-            2
+            15
         );
     }
 }

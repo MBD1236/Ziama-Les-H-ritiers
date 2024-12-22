@@ -62,19 +62,19 @@ class TransactionFournisseurRepository extends ServiceEntityRepository
         return $this->paginator->paginate(
             $this->createQueryBuilder('t')
             ->innerJoin('t.fournisseur', 'f')
-            ->where('f.nom LIKE :query OR t.modePaiement LIKE :query OR t.description LIKE :query OR t.montant LIKE :query OR t.dateTransaction LIKE :query')
+            ->where('f.nom LIKE :query OR t.modePaiement LIKE :query OR t.description LIKE :query OR t.montant LIKE :query OR t.dateTransaction LIKE :query')->orderBy('t.id', 'DESC')
             ->setParameter('query', '%'.$query.'%')
             ,
             $page,
-            2
+            15
         );
     }
     public function paginateTransactionFournisseurs(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('t'),
+            $this->createQueryBuilder('t')->orderBy('t.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 }

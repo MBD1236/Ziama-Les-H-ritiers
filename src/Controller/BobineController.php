@@ -67,6 +67,24 @@ class BobineController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_admin_bobine_delete', methods: ['DELETE'])]
+    public function delete(Bobine $bobine, MouvementBobineRepository $mbr, EntityManagerInterface $em): Response
+    {
+        try {
+            $mvts = $mbr->findBy(['bobine' => $bobine]);
+            foreach ($mvts as $mvt) {
+                $em->remove($mvt);
+            }
+            $em->remove($bobine);
+            $em->flush();
+            $this->addFlash('success', 'La bobine a bien été supprimée.');
+            return $this->redirectToRoute('app_admin_bobine_index');
+        } catch (\Throwable $th) {
+            $this->addFlash('danger', 'Erreur de suppression.');
+            return $this->redirectToRoute('app_admin_bobine_index');
+        }
+    }
+
     #[Route('/{id}/ajout-stock', name: 'app_admin_bobine_ajout_stock', methods:['POST'])]
     public function ajoutStock(Bobine $bobine, Request $request, EntityManagerInterface $em): Response
     {

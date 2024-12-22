@@ -41,18 +41,18 @@ class LivraisonRepository extends ServiceEntityRepository
             $this->createQueryBuilder('l')
             ->innerJoin('l.commande', 'c')
             ->innerJoin('l.user', 'u')
-            ->where('c.codeCommande LIKE :query OR u.username LIKE :query')
+            ->where('c.codeCommande LIKE :query OR u.username LIKE :query')->orderBy('l.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            2
+            15
         );
     }
     public function paginateLivraisons(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('l'),
+            $this->createQueryBuilder('l')->orderBy('l.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 }

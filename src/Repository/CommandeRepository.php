@@ -97,9 +97,9 @@ class CommandeRepository extends ServiceEntityRepository
     public function paginateCommandes(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('c'),
+            $this->createQueryBuilder('c')->orderBy('c.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
     public function paginateCommandesWithSearch(string $query, int $page): PaginationInterface
@@ -109,10 +109,10 @@ class CommandeRepository extends ServiceEntityRepository
             ->innerJoin('c.client', 'cl')
             ->innerJoin('c.production', 'p')
             ->innerJoin('c.user', 'u')
-            ->where('cl.nom LIKE :query OR c.dateCommande LIKE :query OR p.codeProduction LIKE :query OR u.username LIKE :query')
+            ->where('cl.nom LIKE :query OR c.dateCommande LIKE :query OR p.codeProduction LIKE :query OR u.username LIKE :query')->orderBy('c.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            2
+            15
         );
     }
 }

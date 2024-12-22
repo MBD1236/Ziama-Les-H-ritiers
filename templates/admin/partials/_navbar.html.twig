@@ -39,15 +39,6 @@
                 </div>
             </button>
 
-            <!-- Topbar Search Form -->
-            <div class="app-search d-none d-lg-block">
-                <form>
-                    <div class="input-group">
-                        <input type="search" class="form-control" placeholder="Search...">
-                        <span class="ri-search-line search-icon text-muted"></span>
-                    </div>
-                </form>
-            </div>
         </div>
 
         <ul class="topbar-menu d-flex align-items-center gap-3">
@@ -80,11 +71,8 @@
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none nav-user" data-bs-toggle="dropdown" href="#" role="button"
                     aria-haspopup="false" aria-expanded="false">
-                    <span class="account-user-avatar">
-                        <img src="{{ asset('admin/images/users/avatar-1.jpg') }}" alt="user-image" width="32" class="rounded-circle">
-                    </span>
                     <span class="d-lg-block d-none">
-                        <h5 class="my-0 fw-normal">Thomson <i
+                        <h5 class="my-0 fw-normal">{{ app.user.username }}<i
                                 class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i></h5>
                     </span>
                 </a>

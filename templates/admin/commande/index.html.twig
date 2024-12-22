@@ -64,9 +64,33 @@
                                     {% else %}
                                     <td class="fw-bold">{{ c.statut }}</td>
                                     {% endif %}
-                                    <td>
+                                    <td class="d-flex gap-2 justify-content-end w-100 align-items-center">
                                         <a href="{{ path('app_admin_commande_edit', {'id': c.id}) }}" class="bi-pencil"></a>
                                         <a href="{{ path('app_admin_commande_facture', {'id': c.id}) }}" class="bi-eye" title="Voir la facture"></a>
+                                        
+                                        <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
+
+
+                                        <!-- Danger Alert Modal -->
+                                        <div id="danger-alert-modal-{{ k }}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content modal-filled bg-danger">
+                                                    <div class="modal-body p-4">
+                                                        <div class="text-center">
+                                                            <i class="ri-close-circle-line h1"></i>
+                                                            <h4 class="mt-2">Suppression!</h4>
+                                                            <p class="mt-3">Voulez-vous vraiment supprimer cet enregistrement ?.</p>
+                                                            <form action="{{ path('app_admin_commande_delete', {'id': c.id}) }}" method="post">
+                                                                <input type="hidden" name="_method" value="DELETE">
+                                                                <button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Non</button>
+                                                                <button type="submit" class="btn btn-light">Oui</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- /.modal-content -->
+                                            </div><!-- /.modal-dialog -->
+                                        </div><!-- /.modal -->
+                                        
                                     </td>
                                 </tr>
                             {% endfor %}

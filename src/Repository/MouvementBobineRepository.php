@@ -22,9 +22,9 @@ class MouvementBobineRepository extends ServiceEntityRepository
     public function paginateMouvementsBobine(Bobine $bobine,int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('m')->where('m.bobine = :bobine')->setParameter('bobine', $bobine),
+            $this->createQueryBuilder('m')->where('m.bobine = :bobine')->setParameter('bobine', $bobine)->orderBy('m.id', 'DESC'),
             $page,
-            1
+            15
         );
     }
 }

@@ -52,18 +52,18 @@ class ProductionRepository extends ServiceEntityRepository
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('p')->where('p.nombrePack > 0')
-            ->where('p.codeProduction LIKE :query OR p.dateProduction LIKE :query')
+            ->andWhere('p.codeProduction LIKE :query OR p.dateProduction LIKE :query')->orderBy('p.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            1
+            15
         );
     }
     public function paginateProductions(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('p')->where('p.nombrePack > 0'),
+            $this->createQueryBuilder('p')->where('p.nombrePack > 0')->orderBy('p.id', 'DESC'),
             $page,
-            1
+            15
         );
     }
 

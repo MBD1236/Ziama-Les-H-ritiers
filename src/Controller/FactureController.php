@@ -72,6 +72,14 @@ class FactureController extends AbstractController
             'facture' => $facture
         ]);
     }
+    #[Route('/{id}', name: 'app_admin_facture_delete', methods: ['DELETE'])]
+    public function delete(Facture $facture, EntityManagerInterface $em): Response
+    {
+        $em->remove($facture);
+        $em->flush();
+        $this->addFlash('success', 'Le facture a bien été supprimée.');
+        return $this->redirectToRoute('app_admin_facture_index');
+    }
 
     #[Route('/search', name: 'app_admin_facture_search', methods:['GET'])]
     public function search(Request $request, FactureRepository $factureRepository): Response

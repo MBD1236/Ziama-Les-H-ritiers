@@ -23,20 +23,20 @@ class FournisseurRepository extends ServiceEntityRepository
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('f')
-                ->where('f.nom LIKE :query OR f.adresse LIKE :query OR f.telephone LIKE :query OR f.email LIKE :query OR f.produitFourni LIKE :query')
+                ->where('f.nom LIKE :query OR f.adresse LIKE :query OR f.telephone LIKE :query OR f.email LIKE :query OR f.produitFourni LIKE :query')->orderBy('f.id', 'DESC')
                 ->setParameter('query', '%'.$query.'%') 
             ,
             $page,
-            2
+            15
         );
     }
 
     public function paginateFournisseurs(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('f'),
+            $this->createQueryBuilder('f')->orderBy('f.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 }

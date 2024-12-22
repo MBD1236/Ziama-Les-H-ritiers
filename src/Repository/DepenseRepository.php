@@ -59,9 +59,9 @@ class DepenseRepository extends ServiceEntityRepository
     public function paginateDepenses(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('d'),
+            $this->createQueryBuilder('d')->orderBy('d.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 
@@ -69,7 +69,7 @@ class DepenseRepository extends ServiceEntityRepository
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('d')
-            ->where('d.type LIKE :query OR d.description LIKE :query OR d.dateDepense LIKE :query OR d.montant LIKE :query')
+            ->where('d.type LIKE :query OR d.description LIKE :query OR d.dateDepense LIKE :query OR d.montant LIKE :query')->orderBy('d.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
             2

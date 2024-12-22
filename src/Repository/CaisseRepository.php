@@ -30,20 +30,20 @@ class CaisseRepository extends ServiceEntityRepository
     public function paginateCaisses(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('c'),
+            $this->createQueryBuilder('c')->orderBy('c.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
     public function paginateCaissesWithSearch(string $query, int $page): PaginationInterface
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('c')
-                ->where('c.type LIKE :query OR c.date LIKE :query OR c.montant LIKE :query')
+                ->where('c.type LIKE :query OR c.date LIKE :query OR c.montant LIKE :query')->orderBy('c.id', 'DESC')
                 ->setParameter('query', '%'.$query.'%')
             ,
             $page,
-            2
+            15
         );
     }
 }

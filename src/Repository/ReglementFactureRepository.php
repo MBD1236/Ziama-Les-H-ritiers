@@ -23,19 +23,19 @@ class ReglementFactureRepository extends ServiceEntityRepository
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('r')
-            ->where('r.modeReglement LIKE :query OR r.date LIKE :query')
+            ->where('r.modeReglement LIKE :query OR r.date LIKE :query')->orderBy('r.id', 'DESC')
             ->setParameter('query', '%'.$query.'%')
             ,
             $page,
-            2
+            15
         );
     }
     public function paginateReglementFactures(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('r'),
+            $this->createQueryBuilder('r')->orderBy('r.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 

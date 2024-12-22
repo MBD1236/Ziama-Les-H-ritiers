@@ -26,7 +26,7 @@ class TransactionFournisseurController extends AbstractController
      }
  
      #[Route('/new', name: 'app_admin_transaction_fournisseur_new', methods:['GET','POST'])]
-     public function transactionFournisseurs(Request $request, EntityManagerInterface $em): Response
+     public function new(Request $request, EntityManagerInterface $em): Response
      {
          $transactionFournisseur = new TransactionFournisseur();
          $form = $this->createForm(TransactionFournisseurType::class, $transactionFournisseur);
@@ -44,7 +44,7 @@ class TransactionFournisseurController extends AbstractController
              $em->persist($transactionFournisseur);
              $em->persist($caisse);
              $em->flush();
-             $this->addFlash('success', 'La  transaction du fournisseur a bien été enregistré.');
+             $this->addFlash('success', 'La  transaction du fournisseur a bien été enregistrée.');
              return $this->redirectToRoute('app_admin_transaction_fournisseur_index');
          }
  
@@ -53,6 +53,34 @@ class TransactionFournisseurController extends AbstractController
          ]);
  
      }
+     #[Route('/{id}/edit', name: 'app_admin_transaction_fournisseur_edit', methods:['GET','POST'])]
+     public function edit(TransactionFournisseur $transactionFournisseur, Request $request, EntityManagerInterface $em): Response
+     {
+         $form = $this->createForm(TransactionFournisseurType::class, $transactionFournisseur);
+         $form->handleRequest($request);
+ 
+         if ($form->isSubmitted() && $form->isValid())
+         {
+             
+             $em->flush();
+             $this->addFlash('success', 'La  transaction du fournisseur a bien été modifiée.');
+             return $this->redirectToRoute('app_admin_transaction_fournisseur_index');
+         }
+ 
+         return $this->render('admin/transaction_fournisseur/new.html.twig', [
+             'form' => $form
+         ]);
+ 
+     }
+
+     #[Route('/{id}', name: 'app_admin_transaction_fournisseur_delete', methods: ['DELETE'])]
+    public function delete(TransactionFournisseur $tfournisseur, EntityManagerInterface $em): Response
+    {
+        $em->remove($tfournisseur);
+        $em->flush();
+        $this->addFlash('success', 'La transaction a bien été supprimée.');
+        return $this->redirectToRoute('app_admin_transaction_fournisseur_index');
+    }
 
      #[Route('/search', name: 'app_admin_transaction_fournisseur_search', methods:['GET'])]
      public function search(Request $request, TransactionFournisseurRepository $transactionFournisseurRepository): Response

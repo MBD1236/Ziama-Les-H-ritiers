@@ -25,18 +25,18 @@ class ProductionEmployeRepository extends ServiceEntityRepository
             $this->createQueryBuilder('p')
             ->innerJoin('p.user', 'u')
             ->innerJoin('p.production', 'production')
-            ->where('u.username LIKE :query OR production.codeProduction LIKE :query')
+            ->where('u.username LIKE :query OR production.codeProduction LIKE :query')->orderBy('p.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            2
+            15
         );
     }
     public function paginateProductionEmployes(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('p'),
+            $this->createQueryBuilder('p')->orderBy('p.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 }

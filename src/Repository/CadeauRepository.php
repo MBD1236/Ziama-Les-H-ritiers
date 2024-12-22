@@ -22,9 +22,9 @@ class CadeauRepository extends ServiceEntityRepository
     public function paginateCadeau(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('c'),
+            $this->createQueryBuilder('c')->orderBy('c.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
     public function paginateCadeauWithSearch(string $query, int $page): PaginationInterface
@@ -33,10 +33,10 @@ class CadeauRepository extends ServiceEntityRepository
             $this->createQueryBuilder('c')
                 ->innerJoin('c.client', 'cl')
                 ->innerJoin('c.production', 'p')
-                ->where('cl.nom LIKE :query OR c.date LIKE :query OR p.codeProduction LIKE :query OR c.description LIKE :query')
+                ->where('cl.nom LIKE :query OR c.date LIKE :query OR p.codeProduction LIKE :query OR c.description LIKE :query')->orderBy('c.id', 'DESC')
                 ->setParameter('query', '%'.$query.'%'),
             $page,
-            2
+            15
         );
     }
 }

@@ -21,9 +21,9 @@ class BobineRepository extends ServiceEntityRepository
     public function paginateBobines(int $page): PaginationInterface
     {
         return $this->paginator->paginate(
-            $this->createQueryBuilder('b'),
+            $this->createQueryBuilder('b')->orderBy('b.id', 'DESC'),
             $page,
-            2
+            15
         );
     }
 
@@ -31,10 +31,10 @@ class BobineRepository extends ServiceEntityRepository
     {
         return $this->paginator->paginate(
             $this->createQueryBuilder('b')
-            ->where('b.type LIKE :query OR b.prixUnitaire LIKE :query')
+            ->where('b.type LIKE :query OR b.prixUnitaire LIKE :query')->orderBy('b.id', 'DESC')
             ->setParameter('query', '%'.$query.'%'),
             $page,
-            1
+            15
         );
     }
 

@@ -59,6 +59,15 @@ class ClientController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_admin_client_delete', methods: ['DELETE'])]
+    public function delete(Client $client, EntityManagerInterface $em): Response
+    {
+        $em->remove($client);
+        $em->flush();
+        $this->addFlash('success', 'Le client a bien été supprimé.');
+        return $this->redirectToRoute('app_admin_client_index');
+    }
+
     #[Route('/search', name: 'app_admin_client_search', methods:['GET'])]
     public function search(Request $request, ClientRepository $clientRepository): Response
     {

@@ -62,7 +62,6 @@ class CadeauController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid())
         {
-
             $em->flush();
             $this->addFlash('success', 'le cadeau a bien été modifié.');
             return $this->redirectToRoute('app_admin_cadeau_index');
@@ -70,6 +69,20 @@ class CadeauController extends AbstractController
         return $this->render('admin/cadeau/edit.html.twig', [
             'form' => $form
         ]);
+    }
+
+    #[Route('/{id}', name: 'app_admin_cadeau_delete', methods: ['DELETE'])]
+    public function delete(Cadeau $cadeau, EntityManagerInterface $em): Response
+    {
+        /* Je remet la quantité du cadeau dans le stock(Production) */
+        $production = $cadeau->getProduction();
+        $nbrePack = $production->getNombrePack();
+        $production->setNombrePack($nbrePack + $cadeau->getQuantite());
+
+        $em->remove($cadeau);
+        $em->flush();
+        $this->addFlash('success', 'Le cadeau a bien été supprimé.');
+        return $this->redirectToRoute('app_admin_cadeau_index');
     }
 
     #[Route('/search', name: 'app_admin_cadeau_search', methods:['GET'])]

@@ -69,6 +69,24 @@ class DepenseController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_admin_depense_delete', methods: ['DELETE'])]
+    public function delete(Depense $depense, EntityManagerInterface $em): Response
+    {
+        /* Je remet l'argent de la depense a supprimer dans la caisse */
+        /* Enregistrer le montantRegle dans la caisse */
+        $caisse = new Caisse();
+        $caisse->setDate($depense->getDateDepense());
+        $caisse->setType('Encaissement');
+        $caisse->setMontant($depense->getMontant());
+        $caisse->setDescription('Supressin d\'une dépense');
+        $em->persist($caisse);
+
+        $em->remove($depense);
+        $em->flush();
+        $this->addFlash('success', 'La depense a bien été supprimée.');
+        return $this->redirectToRoute('app_admin_depense_index');
+    }
+
     #[Route('/search', name: 'app_admin_depense_search', methods:['GET'])]
     public function search(Request $request, DepenseRepository $depenseRepository): Response
     {
@@ -78,12 +96,15 @@ class DepenseController extends AbstractController
         if ($query)
         {
             $depenses = $depenseRepository->paginateDepensesWithSearch($query, $page);
+            $dep = $depenses->getItems();
+            
         }else{
             $depenses = [];
         }
         return $this->render('admin/depense/index.html.twig', [
             'depenses' => $depenses,
-            'query' => $query
+            'query' => $query,
+            'dep' => $dep
         ]);
     }
 

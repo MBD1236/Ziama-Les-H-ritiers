@@ -108,7 +108,7 @@ class AccueilController extends AbstractController
             'scales' => [
                 'y' => [
                     'ticks' => [
-                        'stepSize' => 1, // Affiche les ticks par incréments de 1
+                        'stepSize' => 10, // Affiche les ticks par incréments de 1
                     ],
                 ],
             ],
@@ -146,7 +146,7 @@ class AccueilController extends AbstractController
             'scales' => [
                 'y' => [
                     'ticks' => [
-                        'stepSize' => 5000, // Affiche les ticks par incréments de 1
+                        'stepSize' => 50000, // Affiche les ticks par incréments de 1
                     ],
                 ],
             ],

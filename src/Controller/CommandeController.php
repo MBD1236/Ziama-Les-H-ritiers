@@ -7,6 +7,7 @@ use App\Entity\Facture;
 use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
 use App\Repository\FactureRepository;
+use App\Repository\ProductionRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -87,7 +88,7 @@ class CommandeController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_admin_commande_edit', methods:['GET', 'POST'])]
-    public function edit(Commande $commande, Request $request, EntityManagerInterface $em): Response
+    public function edit(Commande $commande, FactureRepository $factureRepository, Request $request, EntityManagerInterface $em): Response
     {
 
         $form = $this->createForm(CommandeType::class, $commande);
@@ -95,6 +96,11 @@ class CommandeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $montantTotal = $commande->getQuantite() * 5000;
+            $commande->setMontantTotal($montantTotal);
+            $facture = $factureRepository->findOneBy(['commande' => $commande]);
+            $facture->setMontantRestant($montantTotal);
+
             $em->flush();
             $this->addFlash('success', 'La commande a été bien modifiée.');
             return $this->redirectToRoute('app_admin_commande_index');
@@ -102,6 +108,22 @@ class CommandeController extends AbstractController
         return $this->render('admin/commande/edit.html.twig', [
             'form' => $form
         ]);
+    }
+
+    #[Route('/{id}', name: 'app_admin_commande_delete', methods: ['DELETE'])]
+    public function delete(Commande $commande, FactureRepository $factureRepository, ProductionRepository $productionRepository, EntityManagerInterface $em): Response
+    {
+        /* Je supprime la facture correspondante puis remet la quantité commandée dans le stock(Production) */
+        $facture = $factureRepository->findOneBy(['commande' => $commande]);
+        $production = $commande->getProduction();
+        $nbrePack = $production->getNombrePack();
+        $production->setNombrePack($nbrePack + $commande->getQuantite());
+
+        $em->remove($facture);
+        $em->remove($commande);
+        $em->flush();
+        $this->addFlash('success', 'Le commande a bien été supprimée.');
+        return $this->redirectToRoute('app_admin_commande_index');
     }
 
     #[Route('/{id}/facture', name: 'app_admin_commande_facture', methods:['GET'])]

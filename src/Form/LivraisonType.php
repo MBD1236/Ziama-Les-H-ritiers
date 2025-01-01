@@ -18,7 +18,9 @@ class LivraisonType extends AbstractType
         $builder
             ->add('commande', EntityType::class, [
                 'class' => Commande::class,
-                'choice_label' => 'codeCommande',
+                'choice_label' => function(Commande $commande){
+                    return $commande->getCodeCommande() . ' (' . $commande->getProduction()->getCodeProduction() . ' : ' . $commande->getQuantite() .' =>' . $commande->getMontantTotal() . 'GNF)' . ' - ' .$commande->getClient()->getNom();
+                },
                 'label' => 'Commande',
                 'required' => true,
                 'autocomplete' => true

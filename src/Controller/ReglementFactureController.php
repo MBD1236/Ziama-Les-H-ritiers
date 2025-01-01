@@ -34,7 +34,7 @@ class ReglementFactureController extends AbstractController
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query)
+        if ($query or $query == '')
         {
             $reglements = $reglementFactureRepository->paginateReglementFacturesWithSearch($query, $page);
         }else{

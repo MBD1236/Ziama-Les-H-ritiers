@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Caisse;
 use App\Entity\TransactionFournisseur;
 use App\Form\TransactionFournisseurType;
+use App\Repository\CaisseRepository;
 use App\Repository\TransactionFournisseurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,7 @@ class TransactionFournisseurController extends AbstractController
      }
  
      #[Route('/new', name: 'app_admin_transaction_fournisseur_new', methods:['GET','POST'])]
-     public function new(Request $request, EntityManagerInterface $em): Response
+     public function new(Request $request, EntityManagerInterface $em, CaisseRepository $caisseRepository): Response
      {
          $transactionFournisseur = new TransactionFournisseur();
          $form = $this->createForm(TransactionFournisseurType::class, $transactionFournisseur);
@@ -34,11 +35,19 @@ class TransactionFournisseurController extends AbstractController
  
          if ($form->isSubmitted() && $form->isValid())
          {
+            /*verifier si la somme a decaisser existe dans la caisse */
+            $sommeCaisse = $caisseRepository->getEtatCaisse();
+            $montantTransaction = $transactionFournisseur->getMontant();
+            if ($montantTransaction > $sommeCaisse){
+                $this->addFlash('danger', 'Solde insuffisant.');
+                return $this->redirectToRoute('app_admin_transaction_fournisseur_index');
+            }
+
              /* Enregistrer le montantRegle dans la caisse */
              $caisse = new Caisse();
              $caisse->setDate($transactionFournisseur->getDateTransaction());
              $caisse->setType('Décaissement');
-             $caisse->setMontant($transactionFournisseur->getMontant());
+             $caisse->setMontant($montantTransaction);
              $caisse->setDescription('Paiement d\'un fournisseur');
  
              $em->persist($transactionFournisseur);
@@ -87,7 +96,7 @@ class TransactionFournisseurController extends AbstractController
      {
          $query = $request->query->get('recherche');
          $page = $request->query->getInt('page', 1);
-         if ($query)
+         if ($query or $query == '')
          {
             $transactions = $transactionFournisseurRepository->paginateTransactionFournisseursWithSearch($query, $page);
          }else{

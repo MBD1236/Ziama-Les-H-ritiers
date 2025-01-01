@@ -20,11 +20,15 @@ class CaisseRepository extends ServiceEntityRepository
 
     public function getEtatCaisse(): int
     {
-        return $this->createQueryBuilder('c')
+        try {
+            return $this->createQueryBuilder('c')
             ->select('SUM(CASE WHEN c.type = :encaissement THEN c.montant ELSE -c.montant END) AS solde')
             ->setParameter('encaissement', 'encaissement')
             ->getQuery()
             ->getSingleScalarResult();
+        } catch (\Throwable $th) {
+            return 0;
+        }
     }
 
     public function paginateCaisses(int $page): PaginationInterface

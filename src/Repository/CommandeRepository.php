@@ -28,9 +28,24 @@ class CommandeRepository extends ServiceEntityRepository
     }
    
 
+    public function countOrdersByDay($year, $month, $day): int
+    {
+
+        $startDate = new DateTime("$year-$month-$day 00:00:00");
+        $endDate = new DateTime("$year-$month-$day 23:59:59");
+
+        return  $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.dateCommande BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
     public function countOrdersByMonth($year, $month): int
     {
-        
+        // dd($year);
         $startDate = new DateTime("$year-$month-01 00:00:00");
         $endDate = new DateTime("$year-$month-31 23:59:59");
 

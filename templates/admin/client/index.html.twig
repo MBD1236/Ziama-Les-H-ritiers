@@ -27,7 +27,7 @@
                     </form>
                 </div>
                 <div>
-                    <a href="{{ path('app_admin_client_new')}}" class="btn btn-primary">Enregistrer une client</a>
+                    <a href="{{ path('app_admin_client_new')}}" class="btn btn-primary">Enregistrer un client</a>
                 </div>
             </div>
             <div class="card-body table-responsive">
@@ -79,7 +79,9 @@
                             {% endfor %}
                         </tbody>
                 </table>
+                {% if query is defined and query != '' %}
                 {{ knp_pagination_render(clients) }}
+                {% endif %}
             </div>
         </div>
     </div>

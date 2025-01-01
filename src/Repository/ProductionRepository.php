@@ -19,9 +19,18 @@ class ProductionRepository extends ServiceEntityRepository
         parent::__construct($registry, Production::class);
     }
 
-       /**
-        * @return Production[] Returns an array of Production objects
-        */
+
+    public function countAll(): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+    * @return Production[] Returns an array of Production objects
+    */
     public function findByStock(): array
     {
         return $this->createQueryBuilder('p')
@@ -33,6 +42,20 @@ class ProductionRepository extends ServiceEntityRepository
         ;
     }
 
+    public function countProductionsByDay($year, $month, $day): int
+    {
+        
+        $startDate = new DateTime("$year-$month-$day 00:00:00");
+        $endDate = new DateTime("$year-$month-$day 23:59:59");
+
+        return  $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.dateProduction BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
     public function countProductionsByMonth($year, $month): int
     {
         

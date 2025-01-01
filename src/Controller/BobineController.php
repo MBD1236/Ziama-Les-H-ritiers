@@ -120,7 +120,7 @@ class BobineController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $mouvementsBobine = $mouvementBobineRepository->paginateMouvementsBobine($bobine, $page);
         return $this->render('admin/bobine/mouvementBobine.html.twig', [
-            'mouvementsBobine' => $mouvementsBobine
+            'mouvementsBobine' => $mouvementsBobine,
         ]);
     }
 
@@ -138,6 +138,22 @@ class BobineController extends AbstractController
         return $this->render('admin/bobine/index.html.twig', [
             'bobines' => $bobines,
             'query' => $query
+        ]);
+    }
+
+    #[Route('/mouvement-bobine/search', name: 'app_admin_mouvement_bobine_search', methods:['GET'])]
+    public function searchMouvement(Request $request, MouvementBobineRepository $mouvementBobineRepository): Response
+    {
+        $query = $request->query->get('recherche');
+        $page = $request->query->getInt('page', 1);
+        if ($query or $query == '')
+        {
+            $mouvementsBobine = $mouvementBobineRepository->paginateMouvementBobineWithSearch($query, $page);
+        }else{
+            $mouvementsBobine = [];
+        }
+        return $this->render('admin/bobine/mouvementBobine.html.twig', [
+            'mouvementsBobine' => $mouvementsBobine
         ]);
     }
 }

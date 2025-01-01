@@ -73,7 +73,7 @@ class ClientController extends AbstractController
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query)
+        if ($query or $query == '')
         {
             $clients = $clientRepository->paginateWithSearch($query, $page);
         }else{

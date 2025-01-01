@@ -98,7 +98,9 @@
                             {% endfor %}
                         </tbody>
                 </table>
+                {% if query is defined and query != '' %}
                 {{ knp_pagination_render(factures) }}
+                {% endif %}
             </div>
         </div>
     </div>

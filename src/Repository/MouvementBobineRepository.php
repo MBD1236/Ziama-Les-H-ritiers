@@ -27,4 +27,16 @@ class MouvementBobineRepository extends ServiceEntityRepository
             15
         );
     }
+    public function paginateMouvementBobineWithSearch(string $query, int $page): PaginationInterface
+    {
+        return $this->paginator->paginate(
+            $this->createQueryBuilder('m')
+            ->innerJoin('m.bobine', 'b')
+            ->where('m.typeMouvement LIKE :query OR m.date LIKE :query OR m.quantite LIKE :query OR b.type LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->orderBy('m.id', 'DESC'),
+            $page,
+            15
+        );
+    }
 }

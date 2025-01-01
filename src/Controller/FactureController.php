@@ -33,8 +33,13 @@ class FactureController extends AbstractController
         $montantRegle = (int)$request->request->get('montantRegle');
         $dateReglement = new DateTime();
 
-        /* Je fais la mise a jour du montantRestant dans la table facture*/
+        /* Je verifie si le montant qu'il a payé n'est pas supérieur au montant qu'il devrait*/
         $montantActuel = $facture->getMontantRestant();
+        if ($montantRegle > $montantActuel) {
+            $this->addFlash('danger', 'Erreur sur le montant à payer.');
+            return $this->redirectToRoute('app_admin_reglement_facture_index');
+        }
+        /* Je fais la mise a jour du montantRestant dans la table facture*/
         $montantRestant = $montantActuel - $montantRegle;
         if ($montantRestant == 0) {
             $facture->setStatut('Réglé');
@@ -86,7 +91,7 @@ class FactureController extends AbstractController
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query)
+        if ($query or $query == '')
         {
             $factures = $factureRepository->paginateFacturesWithSearch($query, $page);
         }else{

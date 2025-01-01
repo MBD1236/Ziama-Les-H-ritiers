@@ -26,35 +26,70 @@ class AccueilController extends AbstractController
     LivraisonRepository $livraisonRepository, ProductionRepository $productionRepository,
     DepenseRepository $depenseRepository, TransactionFournisseurRepository $tfr): Response
     {
-        /** Nombre de clients */
-        $clients = $clientRepository->countAll();
+        /**** */
+        $currentYear = new DateTime();
+        $year = $currentYear->format('Y');
+        $currentMonth = (int)$currentYear->format('m');
+        $day = $currentYear->format('d');
+
+        if ($currentMonth == 1){
+            $months = [9, 10, 11, 12, 1];
+            $lastYear = (int)$year - 1;
+        }
+        elseif ($currentMonth == 2){
+            $months = [10, 11, 12, 1, 2];
+            $lastYear = (int)$year - 1;
+        }
+        elseif ($currentMonth == 3){
+            $months = [11, 12, 1, 2, 3];
+            $lastYear = (int)$year - 1;
+        }
+        elseif ($currentMonth == 4){
+            $months = [12, 1, 2, 3, 4];
+            $lastYear = (int)$year - 1;
+        }
+        else
+            $months = range($currentMonth - 4, $currentMonth);
+
+        /** Nombre de livraisons */
+        $livraisons = $livraisonRepository->countAll();
+        $nombreLivraisonParJour = $livraisonRepository->countLivraisonsByDay($year, $currentMonth,$day);
         /** Etat de la caisse */
         $caisses = $caisseRepository->getEtatCaisse();
         /** Etat des commandes */
         $commandes = $commandeRepository->countAll();
+        $nombreCommandeParJour = $commandeRepository->countOrdersByDay($year, $currentMonth,$day);
         /** Nombre d'employés */
-        $employes = $userRepository->countAll();
-
-        /**** */
-        $currentYear = new DateTime();
-        $year = $currentYear->format('Y');
-        $month = (int)$currentYear->format('m');
-        $months = range($month - 4, $month);
+        $productions = $productionRepository->countAll();
+        $nombreProductionParJour = $productionRepository->countProductionsByDay($year, $currentMonth, $day);
         
-        $dataCommandes = [];
-        $dataLivraisons = [];
-        $dataProductions = [];
-        $data2Commandes = [];
-        $dataDepenses = [];
-        $dataTransactions = [];
+        $nombreCommandesParMois = [];
+        $nombreLivraisonsParMois = [];
+        $nombreProductionsParMois = [];
+        $sommeCommandesParMois = [];
+        $sommeDepensesParMois = [];
+        $sommeTransactionsParMois = [];
+
+
+        
         foreach ($months as $month) {
-            $dataCommandes[] = $commandeRepository->countOrdersByMonth($year, $month);
-            $data2Commandes[] = $commandeRepository->countSumOrdersByMonth($year, $month);
-            $dataLivraisons[] = $livraisonRepository->countLivraisonsByMonth($year, $month);
-            $dataProductions[] = $productionRepository->countProductionsByMonth($year, $month);
-            $dataDepenses[] = $depenseRepository->countSumDepensesByMonth($year, $month);
-            $dataTransactions[] = $tfr->countSumTransactionsByMonth($year, $month);
+            if ($month > $currentMonth) {
+                // Mois qui appartiennent à l'année précédente
+                $nombreCommandesParMois[] = $commandeRepository->countOrdersByMonth($lastYear, $month);
+                $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($lastYear, $month);
+                $nombreProductionsParMois[] = $productionRepository->countProductionsByMonth($lastYear, $month);
+                $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($lastYear, $month);
+                $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($lastYear, $month);
+            } else {
+                // Mois qui appartiennent à l'année en cours
+                $nombreCommandesParMois[] = $commandeRepository->countOrdersByMonth($year, $month);
+                $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($year, $month);
+                $nombreProductionsParMois[] = $productionRepository->countProductionsByMonth($year, $month);
+                $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($year, $month);
+                $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($year, $month);
+            }
         }
+        
         
         // Construire le graphique
         $moisNoms = [
@@ -83,24 +118,23 @@ class AccueilController extends AbstractController
                     'label' => 'Commandes',
                     'backgroundColor' => 'rgba(0, 255, 0, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $dataCommandes, // Les données dynamiques
+                    'data' => $nombreCommandesParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Productions',
                     'backgroundColor' => 'rgba(0, 0, 255, 0.4)',
                     'borderColor' => 'rgba(70, 123, 235, 1)',
-                    'data' => $dataProductions, // Les données dynamiques
+                    'data' => $nombreProductionsParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Livraisons',
                     'backgroundColor' => 'rgba(255, 0, 0, 0.4)',
                     'borderColor' => 'rgba(255, 0, 0, 1)',
-                    'data' => $dataLivraisons, // Les données dynamiques
+                    'data' => $nombreLivraisonsParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
-                
             ],
         ]);
         $chart->setOptions([
@@ -121,21 +155,21 @@ class AccueilController extends AbstractController
                     'label' => 'Commandes',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $data2Commandes, // Les données dynamiques
+                    'data' => $sommeCommandesParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Dépenses',
                     'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
                     'borderColor' => 'rgba(255, 0, 0, 0.4)',
-                    'data' => $dataDepenses, // Les données dynamiques
+                    'data' => $sommeDepensesParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Transaction fournisseurs',
                     'backgroundColor' => 'rgba(54, 29, 200, 0.4)',
                     'borderColor' => 'rgba(54, 29, 200, 1)',
-                    'data' => $dataTransactions, // Les données dynamiques
+                    'data' => $sommeTransactionsParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 
@@ -146,7 +180,7 @@ class AccueilController extends AbstractController
             'scales' => [
                 'y' => [
                     'ticks' => [
-                        'stepSize' => 50000, // Affiche les ticks par incréments de 1
+                        'stepSize' => 100000, // Affiche les ticks par incréments de 1
                     ],
                 ],
             ],
@@ -154,15 +188,15 @@ class AccueilController extends AbstractController
         
         /*** */
         $years = range($year - 4, $year);
-        $data3Commandes = [];
-        $data3Depenses = [];
-        $data3Transactions = [];
+        $sommeCommandesParAnnee = [];
+        $sommeDepensesParAnnee = [];
+        $sommeTransactionsParAnnee = [];
         foreach ($years as $year) {
-            $data3Commandes[] = $commandeRepository->countSumOrdersByYear($year);
-            $data3Depenses[] = $depenseRepository->countSumDepensesByYear($year);
-            $data3Transactions[] = $tfr->countSumTransactionsByYear($year);
+            $sommeCommandesParAnnee[] = $commandeRepository->countSumOrdersByYear($year);
+            $sommeDepensesParAnnee[] = $depenseRepository->countSumDepensesByYear($year);
+            $sommeTransactionsParAnnee[] = $tfr->countSumTransactionsByYear($year);
         }
-        $chart3 = $chartBuilder->createChart(Chart::TYPE_POLAR_AREA);
+        $chart3 = $chartBuilder->createChart(Chart::TYPE_LINE);
         $chart3->setData([
             'labels' => $years, // Les labels deviennent les mois
             'datasets' => [
@@ -170,21 +204,21 @@ class AccueilController extends AbstractController
                     'label' => 'Commandes',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $data3Commandes, // Les données dynamiques
+                    'data' => $sommeCommandesParAnnee, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Dépenses',
                     'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
                     'borderColor' => 'rgba(70, 123, 235, 1)',
-                    'data' => $data3Depenses, // Les données dynamiques
+                    'data' => $sommeDepensesParAnnee, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
                     'label' => 'Transactions',
                     'backgroundColor' => 'rgba(54, 29, 200, 0.4)',
                     'borderColor' => 'rgba(54, 29, 200, 1)',
-                    'data' => $data3Transactions, // Les données dynamiques
+                    'data' => $sommeTransactionsParAnnee, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 
@@ -195,20 +229,93 @@ class AccueilController extends AbstractController
             'scales' => [
                 'y' => [
                     'ticks' => [
-                        'stepSize' => 1, // Affiche les ticks par incréments de 1
+                        'stepSize' => 100000, // Affiche les ticks par incréments de 1
                     ],
                 ],
             ],
         ]);
 
+        /** Recuperer seulement les utilisateurs qui ont le role ROLE_LIVREUR */
+        $utilisateurs = $userRepository->findAll();
+        $em = [];
+        foreach ($utilisateurs as $utilisateur) {
+            $verif = in_array("ROLE_LIVREUR", $utilisateur->getRoles());
+            if ($verif)
+                $em [] = $utilisateur;
+        }
+        $nombreLivraisons = [];
+        $nombreLivraisonsParAn = [];
+        foreach ($em as $e) {
+            $nombreLivraisons[] = $livraisonRepository->countLivraisonUserByMonth($e, $year, $month);
+            $nombreLivraisonsParAn[] = $livraisonRepository->countLivraisonUserByYear($e, $year);
+        }
+        $users = [];
+        foreach ($em as $u) {
+            $users [] = $u->getUsername();
+        }
+        $nomMois = $moisNoms[$month];
+        
+        $chart4 = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart4->setData([
+            'labels' => $users, // Les labels deviennent les mois
+            'datasets' => [
+                [
+                    'label' => $nomMois,
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                    'data' => $nombreLivraisons, // Les données dynamiques
+                    'tension' => 0.4,
+                ],
+            ],
+        ]);
+        $chart4->setOptions([
+            'maintainAspectRatio' => false,
+            'scales' => [
+                'y' => [
+                    'ticks' => [
+                        'stepSize' => 10, // Affiche les ticks par incréments de 1
+                    ],
+                ],
+            ],
+        ]);
+        $chart5 = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart5->setData([
+            'labels' => $users, // Les labels deviennent les mois
+            'datasets' => [
+                [
+                    'label' => $year,
+                    'backgroundColor' => 'rgba(255, 0, 0, 0.4)',
+                    'borderColor' => 'rgba(255, 0, 0, 1)',
+                    'data' => $nombreLivraisonsParAn, // Les données dynamiques
+                    'tension' => 0.4,
+                ],
+            ],
+        ]);
+        $chart5->setOptions([
+            'maintainAspectRatio' => false,
+            'scales' => [
+                'y' => [
+                    'ticks' => [
+                        'stepSize' => 10, // Affiche les ticks par incréments de 1
+                    ],
+                ],
+            ],
+        ]);
+
+
         return $this->render('admin/accueil/index.html.twig', [
-            'clients' => $clients,
+            'livraisons' => $livraisons,
+            'nombreLivraisonParJour' => $nombreLivraisonParJour,
             'commandes' => $commandes,
-            'employes' => $employes,
+            'nombreCommandeParJour' => $nombreCommandeParJour,
+            'productions' => $productions,
+            'nombreProductionParJour' => $nombreProductionParJour,
             'caisses' => $caisses,
             'chart' => $chart,
             'chart2' => $chart2,
             'chart3' => $chart3,
+            'chart4' => $chart4,
+            'chart5' => $chart5,
         ]);
     }
 }

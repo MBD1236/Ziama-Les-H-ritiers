@@ -37,6 +37,7 @@
                             <tr>
                                 <th>N°</th>
                                 <th>Production</th>
+                                <th>Nombre de pack</th>
                                 <th>Employe</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -46,6 +47,7 @@
                                 <tr>
                                     <td>{{ k+1 }}</td>
                                     <td>{{ pe.production.codeProduction }}</td>
+                                    <td>{{ pe.production.nombrePack }}</td>
                                     <td>{{ pe.user.username }} - {{ pe.user.email }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
                                         <a href="{{ path('app_admin_production_employe_edit', {'id': pe.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
@@ -76,7 +78,10 @@
                             {% endfor %}
                         </tbody>
                 </table>
+                {% if query is defined and query != '' %}
                 {{ knp_pagination_render(productionEmployes) }}
+                {% endif %}
+                
             </div>
         </div>
     </div>

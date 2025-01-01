@@ -1,0 +1,94 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Factures</li>
+                </ol>
+            </div>
+            <h4 class="page-title">La facture</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Facture</th>
+                                <th>Commande</th>
+                                <th>Montant réglé</th>
+                                <th>Montant restant</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                <tr>
+                                    <td>{{ facture.codeFacture }}</td>
+                                    <td>{{ facture.commande.codeCommande }}</td>
+                                    <td class="fw-bold">{{ facture.montantRegle }} GNF</td>
+                                    <td class="fw-bold">{{ facture.montantRestant }} GNF</td>
+                                    {% if facture.statut == 'Non réglé' %}
+                                    <td class="fw-bold" style="color:red">{{ facture.statut }}</td>
+                                    {% else %}
+                                        <td class="fw-bold">{{ facture.statut }}</td>
+                                    {% endif %}
+                                    <td class="d-flex gap-2">
+                                        {% if facture.montantRestant == 0  %}
+                                            <button title="Régler la facture" data-bs-toggle="modal" data-bs-target="#primary-header-modal" class="badge bg-primary" disabled>Régler la facture</button>
+                                        {% else %}
+                                            <button title="Régler la facture" data-bs-toggle="modal" data-bs-target="#primary-header-modal" class="badge bg-primary">Régler la facture</button>
+                                        {% endif %}
+                                        <a type="button" href="{{ path('app_admin_livraison_facture_impression', {'id': facture.id}) }}" class="btn btn-primary btn-sm"><span class="bi bi-printer" title="Imprimer la facture"></span></a>
+
+
+                                    <!-- Modal pour régler la facture -->
+                                    <div id="primary-header-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="primary-header-modalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header modal-colored-header bg-primary">
+                                                    <h4 class="modal-title" id="primary-header-modalLabel">Réglement de la facture {{ facture.codeFacture }}</h4>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ path('app_admin_livraison_reglement_facture', {'id': facture.id}) }}" method="POST" id="modal-form">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <label for="form-label">Mode de réglement</label>
+                                                                <select name="modeReglement" id="" class="form-select">
+                                                                    <option value="Espèces">Espèces</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <label for="form-label">Montant à régler</label>
+                                                                <input type="number" class="form-control" name="montantRegle">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                                                            <button type="submit" class="btn btn-primary">Régler</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal -->
+                                    </td>
+                                </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

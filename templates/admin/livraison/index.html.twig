@@ -36,7 +36,13 @@
                             <tr>
                                 <th>N°</th>
                                 <th>Commande</th>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Montant</th>
+                                <th>Client</th>
                                 <th>Employe</th>
+                                <th>Date</th>
+                                <th>Statut</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -45,8 +51,15 @@
                                 <tr>
                                     <td>{{ k+1 }}</td>
                                     <td>{{ l.commande.codeCommande }}</td>
+                                    <td>{{ l.commande.production.codeProduction }}</td>
+                                    <td>{{ l.commande.quantite }}</td>
+                                    <td>{{ l.commande.montantTotal }} GNF</td>
+                                    <td>{{ l.commande.client.nom }}</td>
                                     <td>{{ l.user.username }} - {{ l.user.email }}</td>
+                                    <td>{{ l.dateLivraison|date('Y-m-d')}}</td>
+                                    <td>{{ l.commande.statut }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
+                                        <a href="{{ path('app_admin_livraison_facture', {'id': l.commande.id}) }}" class="btn btn-primary btn-sm bi-eye" title="Voir la facture"></a>
                                         <a href="{{ path('app_admin_livraison_edit', {'id': l.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
 
@@ -75,7 +88,9 @@
                             {% endfor %}
                         </tbody>
                 </table>
+                {% if query is defined and query != '' %}
                 {{ knp_pagination_render(livraisons) }}
+                {% endif %}
             </div>
         </div>
     </div>

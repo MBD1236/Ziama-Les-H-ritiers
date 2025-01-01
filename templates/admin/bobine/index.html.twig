@@ -118,8 +118,9 @@
                             
                         </tbody>
                 </table>
-                {{ knp_pagination_render(bobines) }}
-
+                {% if query is defined and query != '' %}
+                    {{ knp_pagination_render(bobines) }}
+                {% endif %}
             </div>
         </div>
     </div>

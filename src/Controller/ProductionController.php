@@ -45,6 +45,7 @@ class ProductionController extends AbstractController
                 $this->addFlash('danger', 'La quantité à utiliser est supérieure à la quantité disponible en stock.');
                 return $this->redirectToRoute('app_admin_production_index');
             }
+            
             $currentYear = (new DateTime())->format('Y');
             $lastProduction = $productionRepository->findOneBy([], ['id' => 'DESC']);
             $lastId = $lastProduction ? $lastProduction->getId() + 1 : 1;
@@ -115,7 +116,7 @@ class ProductionController extends AbstractController
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query)
+        if ($query or $query == '')
         {
             $productions = $productionRepository->paginateProductionsWithSearch($query, $page);
         }else{

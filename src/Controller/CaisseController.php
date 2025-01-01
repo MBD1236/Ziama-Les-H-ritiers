@@ -72,7 +72,7 @@ class CaisseController extends AbstractController
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
 
-        if ($query)
+        if ($query or $query == '')
         {
             $caisses = $caisseRepository->paginateCaissesWithSearch($query, $page);
         }else{

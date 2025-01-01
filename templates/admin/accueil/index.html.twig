@@ -9,25 +9,13 @@
                     <li class="breadcrumb-item active">Tableau de bord</li>
                 </ol>
             </div>
-            <h4 class="page-title">Accueil</h4>
+            <h4 class="page-title">Tableau de bord</h4>
         </div>
     </div>
 </div>
 {% endblock title %}
 {% block body %}
 <div class="row">
-    <div class="col-xxl-3 col-sm-6">
-        <div class="card widget-flat text-bg-pink">
-            <div class="card-body">
-                <div class="float-end">
-                    <i class="ri-user-line widget-icon"></i>
-                </div>
-                <h6 class="text-uppercase mt-0" title="Customers">Clients</h6>
-                <h2 class="my-2">{{ clients }}</h2>
-            </div>
-        </div>
-    </div> <!-- end col-->
-
     <div class="col-xxl-3 col-sm-6">
         <div class="card widget-flat text-bg-purple">
             <div class="card-body">
@@ -42,13 +30,41 @@
     </div> <!-- end col-->
 
     <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat text-bg-pink">
+            <div class="card-body">
+                <div class="float-end">
+                    <i class="ri-briefcase-line widget-icon"></i>
+                </div>
+                <div class="d-flex gap-3">
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Livraisons</h6>
+                        <h2 class="my-2">{{ livraisons }}</h2>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
+                        <h2 class="my-2">{{ nombreLivraisonParJour }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end col-->
+
+    <div class="col-xxl-3 col-sm-6">
         <div class="card widget-flat text-bg-info">
             <div class="card-body">
                 <div class="float-end">
                     <i class="ri-shopping-basket-line widget-icon"></i>
                 </div>
-                <h6 class="text-uppercase mt-0" title="Customers">Commandes</h6>
-                <h2 class="my-2">{{ commandes }}</h2>
+                <div class="d-flex gap-3">
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Commandes</h6>
+                        <h2 class="my-2">{{ commandes }}</h2>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
+                        <h2 class="my-2">{{ nombreCommandeParJour }}</h2>
+                    </div>
+                </div>
             </div>
         </div>
     </div> <!-- end col-->
@@ -57,10 +73,18 @@
         <div class="card widget-flat text-bg-primary">
             <div class="card-body">
                 <div class="float-end">
-                    <i class="ri-group-2-line widget-icon"></i>
+                    <i class="ri-briefcase-2-line widget-icon"></i>
                 </div>
-                <h6 class="text-uppercase mt-0" title="Customers">Employés</h6>
-                <h2 class="my-2">{{ employes }}</h2>
+                <div class="d-flex gap-3">
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Productions</h6>
+                        <h2 class="my-2">{{ productions }}</h2>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
+                        <h2 class="my-2">{{ nombreProductionParJour }}</h2>
+                    </div>
+                </div>
                 
             </div>
         </div>
@@ -97,10 +121,31 @@
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
                 <h5 class="text-center mt-2">Somme des commandes, depenses et transaction fournisseurs</h5>
-        
             </div>
             <div class="card-body">
                 {{ render_chart(chart3) }}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+                <h5 class="text-center mt-2">Performance des livreurs par mois</h5>
+            </div>
+            <div class="card-body">
+                {{ render_chart(chart4) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+                <h5 class="text-center mt-2">Performance des livreurs par année</h5>
+            </div>
+            <div class="card-body">
+                {{ render_chart(chart5) }}
             </div>
         </div>
     </div>

@@ -113,7 +113,7 @@ class RegistrationController extends AbstractController
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query)
+        if ($query or $query == '')
         {
             $employes = $userRepository->paginateWithSearch($query, $page);
         }else{

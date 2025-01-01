@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Caisse;
 use App\Entity\Depense;
 use App\Form\DepenseType;
+use App\Repository\CaisseRepository;
 use App\Repository\DepenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,7 +26,7 @@ class DepenseController extends AbstractController
     }
 
     #[Route('/new', name: 'app_admin_depense_new', methods:['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CaisseRepository $caisseRepository): Response
     {
         $depense = new Depense();
         $form = $this->createForm(DepenseType::class, $depense);
@@ -33,11 +34,17 @@ class DepenseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isSubmitted())
         {
+            $sommeCaisse = $caisseRepository->getEtatCaisse();
+            $montantDepense = $depense->getMontant();
+            if ($montantDepense > $sommeCaisse){
+                $this->addFlash('danger', 'Solde insuffisant.');
+                return $this->redirectToRoute('app_admin_depense_index');
+            }
             /* Enregistrer le montantRegle dans la caisse */
             $caisse = new Caisse();
             $caisse->setDate($depense->getDateDepense());
             $caisse->setType('Décaissement');
-            $caisse->setMontant($depense->getMontant());
+            $caisse->setMontant($montantDepense);
             $caisse->setDescription('Depense');
 
             $em->persist($depense);
@@ -93,7 +100,7 @@ class DepenseController extends AbstractController
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
 
-        if ($query)
+        if ($query or $query == '')
         {
             $depenses = $depenseRepository->paginateDepensesWithSearch($query, $page);
             $dep = $depenses->getItems();

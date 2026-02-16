@@ -1,0 +1,161 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_admin_vente_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active">Ajouter les lignes</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Ajout des lignes de vente</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="card-header">
+                <h4 class="header-title">
+                    Vente: <span class="badge bg-primary">{{ vente.codeVente }}</span> 
+                    | Client: <span class="badge bg-info">{{ vente.client.nom }}</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <i class="ri-information-line"></i> 
+                    <strong>Étape 2:</strong> Ajoutez les produits vendus ci-dessous. Vous pouvez ajouter plusieurs lignes.
+                </div>
+
+                {{ form_start(form, {'attr': {'class': 'form-group'}}) }}
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong>Client:</strong> {{ vente.client.nom }}
+                    </div>
+                    <div class="col-6">
+                        <strong>Employé:</strong> {{ vente.user.username }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong>Mode de paiement:</strong> {{ vente.modePaiement }}
+                    </div>
+                    <div class="col-6">
+                        <strong>Date:</strong> {{ vente.dateVente|date('d/m/Y H:i') }}
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">
+                    <i class="ri-shopping-cart-line"></i> Lignes de vente
+                </h5>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Prix unitaire (GNF)</th>
+                                <th>Total ligne (GNF)</th>
+                                <th class="text-center" style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lignes-container" data-prototype="{{ form_widget(form.lignes.vars.prototype) | e('html_attr') }}">
+                            {% for ligne in form.lignes %}
+                                <tr class="ligne-item">
+                                    <td>{{ form_widget(ligne.produit, {'attr': {'class': 'form-select form-select-sm'}}) }}</td>
+                                    <td>{{ form_widget(ligne.quantite, {'attr': {'class': 'form-control form-control-sm quantite-input'}}) }}</td>
+                                    <td>{{ form_widget(ligne.prixUnitaire, {'attr': {'class': 'form-control form-control-sm prix-input'}}) }}</td>
+                                    <td>{{ form_widget(ligne.totalLigne, {'attr': {'class': 'form-control form-control-sm total-input', 'readonly': true}}) }}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-danger btn-sm btn-remove-ligne">
+                                            <i class="ri-trash-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button type="button" class="btn btn-success btn-sm mb-4" id="add-ligne">
+                    <i class="ri-add-line"></i> Ajouter une ligne
+                </button>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-check-line"></i> Finir et créer la facture
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ path('app_admin_vente_index') }}" class="btn btn-secondary">
+                            <i class="ri-close-line"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+                
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('add-ligne').addEventListener('click', function(e) {
+    e.preventDefault();
+    const container = document.getElementById('lignes-container');
+    const index = container.querySelectorAll('tr.ligne-item').length;
+    const prototype = container.getAttribute('data-prototype');
+    const newForm = prototype.replace(/__name__/g, index);
+    
+    const newRow = document.createElement('tr');
+    newRow.className = 'ligne-item';
+    newRow.innerHTML = newForm;
+    container.appendChild(newRow);
+    
+    attachCalculEvent(newRow);
+    attachRemoveEvent(newRow.querySelector('.btn-remove-ligne'));
+});
+
+function attachCalculEvent(row) {
+    const quantiteInput = row.querySelector('.quantite-input');
+    const prixInput = row.querySelector('.prix-input');
+    const totalInput = row.querySelector('.total-input');
+    
+    const updateTotal = function() {
+        const quantite = parseInt(quantiteInput.value) || 0;
+        const prix = parseInt(prixInput.value) || 0;
+        totalInput.value = quantite * prix;
+    };
+    
+    quantiteInput.addEventListener('change', updateTotal);
+    quantiteInput.addEventListener('input', updateTotal);
+    prixInput.addEventListener('change', updateTotal);
+    prixInput.addEventListener('input', updateTotal);
+}
+
+function attachRemoveEvent(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        this.closest('tr.ligne-item').remove();
+    });
+}
+
+// Attach events to existing rows
+document.querySelectorAll('tr.ligne-item').forEach(row => {
+    attachCalculEvent(row);
+    attachRemoveEvent(row.querySelector('.btn-remove-ligne'));
+});
+</script>
+{% endblock body %}

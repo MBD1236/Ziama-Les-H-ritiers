@@ -2,7 +2,7 @@
 
     <!-- Brand Logo Light -->
     <a href="{{ path('app_admin_accueil_index') }}" class="logo logo-light">
-        <h3 class="logo-lg mt-3">Groupe Mandela</h3>
+        <h3 class="logo-lg mt-3">Ziama Les Héritiers</h3>
     </a>
     
     
@@ -38,54 +38,27 @@
 
             {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPagesBobine" aria-expanded="false" aria-controls="sidebarPagesBobine" class="side-nav-link">
+                <a data-bs-toggle="collapse" href="#sidebarPagesProduit" aria-expanded="false" aria-controls="sidebarPagesBobine" class="side-nav-link">
                     <i class="ri-layout-line"></i>
-                    <span>Gestion des bobines</span>
+                    <span>Gestion des produits</span>
                     <span class="menu-arrow"></span>
                 </a>
-                <div class="collapse" id="sidebarPagesBobine">
+                <div class="collapse" id="sidebarPagesProduit">
                     <ul class="side-nav-second-level">
                         <li>
-                            <a href="{{ path('app_admin_bobine_new') }}">Ajouter une bobine</a>
+                            <a href="{{ path('app_admin_categorie_index') }}">Catégories</a>
                         </li>
                         <li>
-                            <a href="{{ path('app_admin_bobine_index') }}">Liste des bobines</a>
+                            <a href="{{ path('app_admin_produit_new') }}">Ajouter un produit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_admin_produit_index') }}">Liste des produits</a>
                         </li>
                     </ul>
                   </div>
             </li>
             {% endif %}
 
-            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRODUCTEUR') %}
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPagesProduction" aria-expanded="false" aria-controls="sidebarPagesProduction" class="side-nav-link">
-                    <i class="ri-briefcase-line"></i>
-                    <span>Gestion productions</span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarPagesProduction">
-                    <ul class="side-nav-second-level">
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <li>
-                            <a href="{{ path('app_admin_production_new') }}">Ajouter une production</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('app_admin_production_index') }}">Liste des productions</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('app_admin_cadeau_index') }}">Cadeaux des clients</a>
-                        </li>
-                        {% endif %}
-
-                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRODUCTEUR') %}
-                            <li>
-                                <a href="{{ path('app_admin_production_employe_index') }}">Production des employes</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </li>
-            {% endif %}
 
             {% if is_granted('ROLE_ADMIN') %}
             <li class="side-nav-item">
@@ -108,19 +81,19 @@
             {% endif %}
             {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LIVREUR') %}
             <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPagesCommande" aria-expanded="false" aria-controls="sidebarPagesCommande" class="side-nav-link">
+                <a data-bs-toggle="collapse" href="#sidebarPagesVente" aria-expanded="false" aria-controls="sidebarPagesCommande" class="side-nav-link">
                     <i class="ri-shopping-bag-line"></i>
-                    <span>Gestion commandes</span>
+                    <span>Gestion ventes</span>
                     <span class="menu-arrow"></span>
                 </a>
-                <div class="collapse" id="sidebarPagesCommande">
+                <div class="collapse" id="sidebarPagesVente">
                     <ul class="side-nav-second-level">
                         {% if is_granted('ROLE_ADMIN') %}
                         <li>
-                            <a href="{{ path('app_admin_commande_new') }}">Ajouter une commande</a>
+                            <a href="{{ path('app_admin_vente_new') }}">Ajouter une vente</a>
                         </li>
                         <li>
-                            <a href="{{ path('app_admin_commande_index') }}">Liste des commandes</a>
+                            <a href="{{ path('app_admin_vente_index') }}">Liste des ventes</a>
                         </li>
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LIVREUR') %}

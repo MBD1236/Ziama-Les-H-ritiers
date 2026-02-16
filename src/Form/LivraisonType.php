@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Commande;
+use App\Entity\Vente;
 use App\Entity\Livraison;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -16,12 +16,19 @@ class LivraisonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('commande', EntityType::class, [
-                'class' => Commande::class,
-                'choice_label' => function(Commande $commande){
-                    return $commande->getCodeCommande() . ' (' . $commande->getProduction()->getCodeProduction() . ' : ' . $commande->getQuantite() .' =>' . $commande->getMontantTotal() . 'GNF)' . ' - ' .$commande->getClient()->getNom();
+            ->add('vente', EntityType::class, [
+                'class' => Vente::class,
+                'choice_label' => function(Vente $vente){
+                    $first = $vente->getLignes()->first();
+                    $prod = $first ? $first->getProduit()->getNom() : '';
+                    $qty = $first ? $first->getQuantite() : 0;
+                    $montant = 0;
+                    foreach ($vente->getLignes() as $l) {
+                        $montant += $l->getTotalLigne() ?? ($l->getPrixUnitaire() * $l->getQuantite());
+                    }
+                    return $vente->getCodeVente() . ' (' . $prod . ' : ' . $qty .' =>' . number_format($montant, 2, ',', ' ') . ' GNF) - ' . $vente->getClient()->getNom();
                 },
-                'label' => 'Commande',
+                'label' => 'Vente',
                 'required' => true,
                 'autocomplete' => true
             ])

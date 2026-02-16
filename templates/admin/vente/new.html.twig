@@ -1,0 +1,84 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_admin_vente_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active">Nouvelle vente</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Enregistrement d'une nouvelle vente</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2 col-md-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <i class="ri-information-line"></i> 
+                    <strong>Étape 1:</strong> Remplissez les informations de base de la vente. Les lignes de produits pourront être ajoutées après la création.
+                </div>
+
+                {{ form_start(form, {'attr': {'class': 'form-group'}}) }}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.client, "Client") }}
+                            {{ form_widget(form.client, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.client) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.user, "Employé") }}
+                            {{ form_widget(form.user, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.user) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.modePaiement) }}
+                            {{ form_widget(form.modePaiement, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_errors(form.modePaiement) }}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-check-line"></i> Créer la vente
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ path('app_admin_vente_index') }}" class="btn btn-secondary">
+                            <i class="ri-close-line"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .alert-info {
+        padding: 15px;
+        border-left: 4px solid #0d6efd;
+    }
+</style>
+{% endblock body %}

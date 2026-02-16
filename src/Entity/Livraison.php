@@ -15,7 +15,7 @@ class Livraison
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'livraisons')]
-    private ?Commande $commande = null;
+    private ?Vente $vente = null;
 
     #[ORM\ManyToOne(inversedBy: 'livraisons')]
     private ?User $user = null;
@@ -28,14 +28,14 @@ class Livraison
         return $this->id;
     }
 
-    public function getCommande(): ?Commande
+    public function getVente(): ?Vente
     {
-        return $this->commande;
+        return $this->vente;
     }
 
-    public function setCommande(?Commande $commande): static
+    public function setVente(?Vente $vente): static
     {
-        $this->commande = $commande;
+        $this->vente = $vente;
 
         return $this;
     }

@@ -19,7 +19,7 @@ class Facture
     private ?string $codeFacture = null;
 
     #[ORM\ManyToOne(inversedBy: 'factures')]
-    private ?Commande $commande = null;
+    private ?Vente $vente = null;
 
     #[ORM\Column]
     private ?int $montantRegle = null;
@@ -58,14 +58,14 @@ class Facture
         return $this;
     }
 
-    public function getCommande(): ?Commande
+    public function getVente(): ?Vente
     {
-        return $this->commande;
+        return $this->vente;
     }
 
-    public function setCommande(?Commande $commande): static
+    public function setVente(?Vente $vente): static
     {
-        $this->commande = $commande;
+        $this->vente = $vente;
 
         return $this;
     }

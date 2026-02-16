@@ -4,12 +4,12 @@ namespace App\Controller;
 
 use App\Repository\CaisseRepository;
 use App\Repository\ClientRepository;
-use App\Repository\CommandeRepository;
 use App\Repository\DepenseRepository;
 use App\Repository\LivraisonRepository;
-use App\Repository\ProductionRepository;
+use App\Repository\ProduitRepository;
 use App\Repository\TransactionFournisseurRepository;
 use App\Repository\UserRepository;
+use App\Repository\VenteRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,9 +21,9 @@ use Symfony\UX\Chartjs\Model\Chart;
 class AccueilController extends AbstractController
 {
     #[Route('/', name: 'app_admin_accueil_index', methods:['GET'])]
-    public function index(ClientRepository $clientRepository, CommandeRepository $commandeRepository,
+    public function index(ClientRepository $clientRepository, VenteRepository $venteRepository,
     CaisseRepository $caisseRepository, UserRepository $userRepository, ChartBuilderInterface $chartBuilder,
-    LivraisonRepository $livraisonRepository, ProductionRepository $productionRepository,
+    LivraisonRepository $livraisonRepository, ProduitRepository $produitRepository,
     DepenseRepository $depenseRepository, TransactionFournisseurRepository $tfr): Response
     {
         /**** */
@@ -56,17 +56,15 @@ class AccueilController extends AbstractController
         $nombreLivraisonParJour = $livraisonRepository->countLivraisonsByDay($year, $currentMonth,$day);
         /** Etat de la caisse */
         $caisses = $caisseRepository->getEtatCaisse();
-        /** Etat des commandes */
-        $commandes = $commandeRepository->countAll();
-        $nombreCommandeParJour = $commandeRepository->countOrdersByDay($year, $currentMonth,$day);
+        /** Etat des ventes */
+        $ventes = $venteRepository->countAll();
+        $nombreVenteParJour = $venteRepository->countOrdersByDay($year, $currentMonth,$day);
         /** Nombre d'employés */
-        $productions = $productionRepository->countAll();
-        $nombreProductionParJour = $productionRepository->countProductionsByDay($year, $currentMonth, $day);
+        $produits = $produitRepository->countAll();
+        // $nombreProductionParJour = $productionRepository->countProductionsByDay($year, $currentMonth, $day);
         
-        $nombreCommandesParMois = [];
+        $nombreVentesParMois = [];
         $nombreLivraisonsParMois = [];
-        $nombreProductionsParMois = [];
-        $sommeCommandesParMois = [];
         $sommeDepensesParMois = [];
         $sommeTransactionsParMois = [];
 
@@ -75,16 +73,14 @@ class AccueilController extends AbstractController
         foreach ($months as $month) {
             if ($month > $currentMonth) {
                 // Mois qui appartiennent à l'année précédente
-                $nombreCommandesParMois[] = $commandeRepository->countOrdersByMonth($lastYear, $month);
+                $nombreVentesParMois[] = $venteRepository->countOrdersByMonth($lastYear, $month);
                 $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($lastYear, $month);
-                $nombreProductionsParMois[] = $productionRepository->countProductionsByMonth($lastYear, $month);
                 $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($lastYear, $month);
                 $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($lastYear, $month);
             } else {
                 // Mois qui appartiennent à l'année en cours
-                $nombreCommandesParMois[] = $commandeRepository->countOrdersByMonth($year, $month);
+                $nombreVentesParMois[] = $venteRepository->countOrdersByMonth($year, $month);
                 $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($year, $month);
-                $nombreProductionsParMois[] = $productionRepository->countProductionsByMonth($year, $month);
                 $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($year, $month);
                 $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($year, $month);
             }
@@ -115,17 +111,10 @@ class AccueilController extends AbstractController
             'labels' => $moisLabels, // Les labels deviennent les mois
             'datasets' => [
                 [
-                    'label' => 'Commandes',
+                    'label' => 'Ventes',
                     'backgroundColor' => 'rgba(0, 255, 0, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $nombreCommandesParMois, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-                [
-                    'label' => 'Productions',
-                    'backgroundColor' => 'rgba(0, 0, 255, 0.4)',
-                    'borderColor' => 'rgba(70, 123, 235, 1)',
-                    'data' => $nombreProductionsParMois, // Les données dynamiques
+                    'data' => $nombreVentesParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
@@ -152,10 +141,10 @@ class AccueilController extends AbstractController
             'labels' => $moisLabels, // Les labels deviennent les mois
             'datasets' => [
                 [
-                    'label' => 'Commandes',
+                    'label' => 'Ventes',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $sommeCommandesParMois, // Les données dynamiques
+                    'data' => $nombreVentesParMois, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
@@ -188,11 +177,11 @@ class AccueilController extends AbstractController
         
         /*** */
         $years = range($year - 4, $year);
-        $sommeCommandesParAnnee = [];
+        $sommeVentesParAnnee = [];
         $sommeDepensesParAnnee = [];
         $sommeTransactionsParAnnee = [];
         foreach ($years as $year) {
-            $sommeCommandesParAnnee[] = $commandeRepository->countSumOrdersByYear($year);
+            $sommeVentesParAnnee[] = $venteRepository->countSumOrdersByYear($year);
             $sommeDepensesParAnnee[] = $depenseRepository->countSumDepensesByYear($year);
             $sommeTransactionsParAnnee[] = $tfr->countSumTransactionsByYear($year);
         }
@@ -204,7 +193,7 @@ class AccueilController extends AbstractController
                     'label' => 'Commandes',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $sommeCommandesParAnnee, // Les données dynamiques
+                    'data' => $sommeVentesParAnnee, // Les données dynamiques
                     'tension' => 0.4,
                 ],
                 [
@@ -306,10 +295,9 @@ class AccueilController extends AbstractController
         return $this->render('admin/accueil/index.html.twig', [
             'livraisons' => $livraisons,
             'nombreLivraisonParJour' => $nombreLivraisonParJour,
-            'commandes' => $commandes,
-            'nombreCommandeParJour' => $nombreCommandeParJour,
-            'productions' => $productions,
-            'nombreProductionParJour' => $nombreProductionParJour,
+            'ventes' => $ventes,
+            'produits' => $produits,
+            'nombreCommandeParJour' => $nombreVenteParJour,
             'caisses' => $caisses,
             'chart' => $chart,
             'chart2' => $chart2,

@@ -1,0 +1,88 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Catégories</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Liste des catégories</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <div>
+                    <form action="{{ path('app_admin_categorie_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                        <input class="form-control" placeholder="Rechercher une catégorie" name="recherche" value="{{ query ?? '' }}">
+                        <button class="btn btn-primary"><span class="bi bi-search"></span></button>
+                    </form>
+                </div>
+                <div>
+                    <a href="{{ path('app_admin_categorie_new')}}" class="btn btn-primary">Ajouter une catégorie</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th>N°</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k, cat in categories %}
+                            <tr class="text-center">
+                                <td>{{ k+1 }}</td>
+                                <td class="fw-bold">{{ cat.nom }}</td>
+                                <td>{{ cat.description }}</td>
+                                <td class="d-flex justify-content-center gap-2 align-items-center">
+                                    <a href="{{ path('app_admin_categorie_edit', {'id': cat.id}) }}" class="btn btn-primary btn-sm bi-pencil" title="Modifier cette catégorie"></a>
+                                    <button type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
+
+                                    <!-- Danger Alert Modal -->
+                                    <div id="danger-alert-modal-{{ k }}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm">
+                                            <div class="modal-content modal-filled bg-danger">
+                                                <div class="modal-body p-4">
+                                                    <div class="text-center">
+                                                        <i class="ri-close-circle-line h1"></i>
+                                                        <h4 class="mt-2">Suppression!</h4>
+                                                        <p class="mt-3">Voulez-vous vraiment supprimer cette catégorie ?</p>
+                                                        <form action="{{ path('app_admin_categorie_delete', {'id': cat.id}) }}" method="post">
+                                                            <input type="hidden" name="_method" value="DELETE">
+                                                            <button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Non</button>
+                                                            <button type="submit" class="btn btn-light">Oui</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Aucune catégorie trouvée</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if query is defined and query != '' %}
+                    {{ knp_pagination_render(categories) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

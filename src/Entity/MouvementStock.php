@@ -2,29 +2,27 @@
 
 namespace App\Entity;
 
-use App\Repository\CadeauRepository;
+use App\Repository\MouvementStockRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CadeauRepository::class)]
-class Cadeau
+#[ORM\Entity(repositoryClass: MouvementStockRepository::class)]
+class MouvementStock
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'cadeaux')]
+    #[ORM\ManyToOne(inversedBy: 'mouvementStocks')]
     private ?Produit $produit = null;
 
-    #[ORM\ManyToOne(inversedBy: 'cadeaux')]
-    private ?Client $client = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $typeMouvement = null;
 
     #[ORM\Column]
     private ?int $quantite = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
@@ -46,14 +44,15 @@ class Cadeau
         return $this;
     }
 
-    public function getClient(): ?Client
+
+    public function getTypeMouvement(): ?string
     {
-        return $this->client;
+        return $this->typeMouvement;
     }
 
-    public function setClient(?Client $client): static
+    public function setTypeMouvement(string $typeMouvement): static
     {
-        $this->client = $client;
+        $this->typeMouvement = $typeMouvement;
 
         return $this;
     }
@@ -66,18 +65,6 @@ class Cadeau
     public function setQuantite(int $quantite): static
     {
         $this->quantite = $quantite;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): static
-    {
-        $this->description = $description;
 
         return $this;
     }

@@ -24,14 +24,17 @@ class Client
     #[ORM\Column(length: 255)]
     private ?string $telephone = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
     #[ORM\Column(length: 255)]
     private ?string $typeClient = null;
 
     /**
-     * @var Collection<int, Commande>
+     * @var Collection<int, Vente>
      */
-    #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'client')]
-    private Collection $commandes;
+    #[ORM\OneToMany(targetEntity: Vente::class, mappedBy: 'client')]
+    private Collection $ventes;
 
     /**
      * @var Collection<int, Cadeau>
@@ -41,7 +44,7 @@ class Client
 
     public function __construct()
     {
-        $this->commandes = new ArrayCollection();
+        $this->ventes = new ArrayCollection();
         $this->cadeaux = new ArrayCollection();
     }
 
@@ -86,6 +89,18 @@ class Client
         return $this;
     }
 
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
     public function getTypeClient(): ?string
     {
         return $this->typeClient;
@@ -99,29 +114,28 @@ class Client
     }
 
     /**
-     * @return Collection<int, Commande>
+     * @return Collection<int, Vente>
      */
-    public function getCommandes(): Collection
+    public function getVentes(): Collection
     {
-        return $this->commandes;
+        return $this->ventes;
     }
 
-    public function addCommande(Commande $commande): static
+    public function addVente(Vente $vente): static
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setClient($this);
+        if (!$this->ventes->contains($vente)) {
+            $this->ventes->add($vente);
+            $vente->setClient($this);
         }
 
         return $this;
     }
 
-    public function removeCommande(Commande $commande): static
+    public function removeVente(Vente $vente): static
     {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getClient() === $this) {
-                $commande->setClient(null);
+        if ($this->ventes->removeElement($vente)) {
+            if ($vente->getClient() === $this) {
+                $vente->setClient(null);
             }
         }
 
@@ -149,7 +163,6 @@ class Client
     public function removeCadeaux(Cadeau $cadeaux): static
     {
         if ($this->cadeaux->removeElement($cadeaux)) {
-            // set the owning side to null (unless already changed)
             if ($cadeaux->getClient() === $this) {
                 $cadeaux->setClient(null);
             }

@@ -6,10 +6,10 @@
             <div class="page-title-right">
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
-                    <li class="breadcrumb-item active">Livraisons</li>
+                    <li class="breadcrumb-item active">Ventes</li>
                 </ol>
             </div>
-            <h4 class="page-title">Liste des livraisons</h4>
+            <h4 class="page-title">Liste des ventes</h4>
         </div>
     </div>
 </div>
@@ -21,13 +21,13 @@
         <div class="card">
             <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
                 <div>
-                    <form action="{{ path('app_admin_livraison_search') }}" method="get" class="d-flex justify-content-between gap-1">
+                    <form action="{{ path('app_admin_vente_search') }}" method="get" class="d-flex justify-content-between gap-1">
                         <input class="form-control" placeholder="Rechercher" name="recherche" value="{{ query ?? '' }}">
                         <button class="btn btn-primary"><span class="bi bi-search"></span></button>
                     </form>
                 </div>
                 <div>
-                    <a href="{{ path('app_admin_livraison_new')}}" class="btn btn-primary">Enregistrer une livraison</a>
+                    <a href="{{ path('app_admin_vente_new')}}" class="btn btn-primary">Enregistrer une vente</a>
                 </div>
             </div>
             <div class="card-body table-responsive">
@@ -36,36 +36,43 @@
                             <tr>
                                 <th>N°</th>
                                 <th>Vente</th>
+                                <th>Client</th>
                                 <th>Produit</th>
                                 <th>Quantité</th>
                                 <th>Montant</th>
-                                <th>Client</th>
-                                <th>Employe</th>
+                                <th>Paiement</th>
                                 <th>Date</th>
+                                <th>Employé</th>
                                 <th>Statut</th>
-                                <th class="text-end">Actions</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for k, l in livraisons %}
+                            {% for k, c in ventes  %}
                                 <tr>
                                     <td>{{ k+1 }}</td>
-                                    <td>{{ l.vente.codeVente }}</td>
-                                    {% set first = l.vente.lignes|first %}
+                                    <td>{{ c.codeVente }}</td>
+                                    <td>{{ c.client.nom }} - {{ c.client.telephone }}</td>
+                                    {% set first = c.getLignes()|first %}
                                     <td>{{ first ? first.produit.nom : '' }}</td>
                                     <td>{{ first ? first.quantite : '' }}</td>
                                     {% set montant = 0 %}
-                                    {% for ligne in l.vente.lignes %}
-                                        {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.prixUnitaire * ligne.quantite)) %}
+                                    {% for l in c.lignes %}
+                                        {% set montant = montant + (l.totalLigne ? l.totalLigne : (l.prixUnitaire * l.quantite)) %}
                                     {% endfor %}
-                                    <td>{{ montant }} GNF</td>
-                                    <td>{{ l.vente.client.nom }}</td>
-                                    <td>{{ l.user.username }} - {{ l.user.email }}</td>
-                                    <td>{{ l.dateLivraison|date('Y-m-d')}}</td>
-                                    <td>{{ l.vente.statut }}</td>
-                                    <td class="d-flex gap-2 justify-content-end w-100">
-                                        <a href="{{ path('app_admin_livraison_facture', {'id': l.vente.id}) }}" class="btn btn-primary btn-sm bi-eye" title="Voir la facture"></a>
-                                        <a href="{{ path('app_admin_livraison_edit', {'id': l.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
+                                    <td class="fw-bold">{{ montant }} GNF</td>
+                                    <td>{{ c.modePaiement }}</td>
+                                    <td>{{ c.dateVente|date('Y-m-d H:i')}}</td>
+                                    <td>{{ c.user.username }}</td>
+                                    {% if c.statut == 'Non réglé' %}
+                                    <td class="fw-bold" style="color:red">{{ c.statut }}</td>
+                                    {% else %}
+                                    <td class="fw-bold">{{ c.statut }}</td>
+                                    {% endif %}
+                                    <td class="d-flex gap-2 justify-content-end w-100 align-items-center">
+                                        {# <a href="{{ path('app_admin_vente_edit', {'id': c.id}) }}" class="bi-pencil"></a> #}
+                                        <a href="{{ path('app_admin_vente_facture', {'id': c.id}) }}" class="bi-eye" title="Voir la facture"></a>
+                                        
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
 
 
@@ -78,7 +85,7 @@
                                                             <i class="ri-close-circle-line h1"></i>
                                                             <h4 class="mt-2">Suppression!</h4>
                                                             <p class="mt-3">Voulez-vous vraiment supprimer cet enregistrement ?.</p>
-                                                            <form action="{{ path('app_admin_livraison_delete', {'id': l.id}) }}" method="post">
+                                                            <form action="{{ path('app_admin_vente_delete', {'id': c.id}) }}" method="post">
                                                                 <input type="hidden" name="_method" value="DELETE">
                                                                 <button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Non</button>
                                                                 <button type="submit" class="btn btn-light">Oui</button>
@@ -88,13 +95,14 @@
                                                 </div><!-- /.modal-content -->
                                             </div><!-- /.modal-dialog -->
                                         </div><!-- /.modal -->
+                                        
                                     </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                 </table>
                 {% if query is defined and query != '' %}
-                {{ knp_pagination_render(livraisons) }}
+                {{ knp_pagination_render(ventes) }}
                 {% endif %}
             </div>
         </div>

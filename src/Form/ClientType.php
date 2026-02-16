@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Client;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,6 +20,10 @@ class ClientType extends AbstractType
             ->add('nom', TextType::class, [
                 'label' => 'Nom complet',
                 'required' => true
+            ])
+            ->add('email', EmailType::class, [
+                'label' => 'Email',
+                'required' => false
             ])
             ->add('adresse', TextType::class, [
                 'label' => 'Adresse',

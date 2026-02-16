@@ -39,16 +39,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var Collection<int, ProductionEmploye>
+     * @var Collection<int, Vente>
      */
-    #[ORM\OneToMany(targetEntity: ProductionEmploye::class, mappedBy: 'user')]
-    private Collection $productionEmployes;
-
-    /**
-     * @var Collection<int, Commande>
-     */
-    #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'user')]
-    private Collection $commandes;
+    #[ORM\OneToMany(targetEntity: Vente::class, mappedBy: 'user')]
+    private Collection $ventes;
 
     /**
      * @var Collection<int, Livraison>
@@ -58,8 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->productionEmployes = new ArrayCollection();
-        $this->commandes = new ArrayCollection();
+        $this->ventes = new ArrayCollection();
         $this->livraisons = new ArrayCollection();
     }
 
@@ -151,59 +144,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, ProductionEmploye>
+     * @return Collection<int, Vente>
      */
-    public function getProductionEmployes(): Collection
+    public function getVentes(): Collection
     {
-        return $this->productionEmployes;
+        return $this->ventes;
     }
 
-    public function addProductionEmploye(ProductionEmploye $productionEmploye): static
+    public function addVente(Vente $vente): static
     {
-        if (!$this->productionEmployes->contains($productionEmploye)) {
-            $this->productionEmployes->add($productionEmploye);
-            $productionEmploye->setUser($this);
+        if (!$this->ventes->contains($vente)) {
+            $this->ventes->add($vente);
+            $vente->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeProductionEmploye(ProductionEmploye $productionEmploye): static
+    public function removeVente(Vente $vente): static
     {
-        if ($this->productionEmployes->removeElement($productionEmploye)) {
-            // set the owning side to null (unless already changed)
-            if ($productionEmploye->getUser() === $this) {
-                $productionEmploye->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection
-    {
-        return $this->commandes;
-    }
-
-    public function addCommande(Commande $commande): static
-    {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommande(Commande $commande): static
-    {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getUser() === $this) {
-                $commande->setUser(null);
+        if ($this->ventes->removeElement($vente)) {
+            if ($vente->getUser() === $this) {
+                $vente->setUser(null);
             }
         }
 

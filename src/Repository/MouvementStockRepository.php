@@ -7,6 +7,7 @@ use App\Entity\LigneVente;
 use App\Entity\MouvementBobine;
 use App\Entity\MouvementStock;
 use App\Entity\Produit;
+use App\Entity\Vente;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\Pagination\PaginationInterface;
@@ -49,6 +50,23 @@ class MouvementStockRepository extends ServiceEntityRepository
             ->innerJoin('m.produit', 'p')
             ->where('p = :produit')
             ->setParameter('produit', $produit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    // src/Repository/MouvementStockRepository.php
+
+    public function findMouvementsByVente(Vente $vente): array
+    {
+        return $this->createQueryBuilder('m')
+            ->innerJoin('m.produit', 'p')
+            ->innerJoin('App\Entity\LigneVente', 'l', 'WITH', 'l.produit = p')
+            ->where('l.vente = :vente')
+            ->andWhere('m.typeMouvement = :type')
+            ->andWhere('m.date >= :dateVente') // Sécurité : seulement après la vente
+            ->setParameter('vente', $vente)
+            ->setParameter('type', 'sortie')
+            ->setParameter('dateVente', $vente->getDateVente())
             ->getQuery()
             ->getResult();
     }

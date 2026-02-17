@@ -38,14 +38,6 @@ class LigneVenteType extends AbstractType
                     'step' => 1
                 ]
             ])
-            ->add('totalLigne', IntegerType::class, [
-                'label' => 'Total ligne (GNF)',
-                'required' => true,
-                'attr' => [
-                    'readonly' => true,
-                    'min' => 0
-                ]
-            ])
         ;
     }
 

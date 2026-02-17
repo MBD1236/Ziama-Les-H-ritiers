@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Vente;
 use App\Entity\Facture;
 use App\Entity\LigneVente;
+use App\Entity\MouvementStock;
 use App\Form\LigneVenteType;
 use App\Form\VenteType;
 use App\Repository\VenteRepository;
@@ -62,108 +63,134 @@ class VenteController extends AbstractController
     }
 
 
-
     #[Route('/{id}/lignes/add', name: 'app_admin_vente_add_lignes', methods: ['GET', 'POST'])]
-    public function addLignes(Vente $vente, FactureRepository $factureRepository, Request $request, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(VenteType::class, $vente);
+    public function addLignes(
+        Vente $vente,
+        FactureRepository $factureRepository,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        // Créer la ligne de vente
+        $ligne = new LigneVente();
+        $form = $this->createForm(LigneVenteType::class, $ligne);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérifier qu'il y a au moins une ligne
-            if (empty($vente->getLignes())) {
-                $this->addFlash('warning', 'Veuillez ajouter au moins une ligne de produit.');
-                return $this->render('admin/vente/add_lignes.html.twig', [
-                    'form' => $form,
-                    'vente' => $vente
-                ]);
+
+            $ligne->setVente($vente);
+            $ligne->setProduit($ligne->getProduit());
+            $ligne->setQuantite($ligne->getQuantite());
+            $ligne->setPrixUnitaire($ligne->getPrixUnitaire());
+            $ligne->setTotalLigne($ligne->getQuantite() * $ligne->getPrixUnitaire());
+
+            // Vérifier le stock
+            $produit = $ligne->getProduit();
+            $stockActuel = $produit->getQuantiteStock();
+
+            if ($stockActuel < $ligne->getQuantite()) {
+                $this->addFlash(
+                    'danger',
+                    'Stock insuffisant pour ' . $produit->getNom() .
+                        ' (disponible: ' . $stockActuel . ')'
+                );
+                return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
             }
 
-            // Calculer le montant total depuis les lignes de vente
-            $montantTotal = 0;
-            $stocksModifies = 0;
-            $detailsStock = [];
+            // Mettre à jour le stock
+            $produit->setQuantiteStock($stockActuel - $ligne->getQuantite());
 
-            foreach ($vente->getLignes() as $ligne) {
-                $produit = $ligne->getProduit();
-                $quantiteVendue = $ligne->getQuantite() ?? 0;
-                $prixUnitaire = $ligne->getPrixUnitaire() ?? 0;
+            // Créer le mouvement de stock
+            $mouvement = new MouvementStock();
+            $mouvement->setProduit($produit);
+            $mouvement->setTypeMouvement('sortie');
+            $mouvement->setQuantite($ligne->getQuantite());
+            $mouvement->setDate(new DateTime());
 
-                // ✅ 1. Calculer le totalLigne
-                $totalLigne = $quantiteVendue * $prixUnitaire;
-                $ligne->setTotalLigne($totalLigne);
-                $montantTotal += $totalLigne;
-
-
-                // ✅ 2. Vérifier le stock
-                if ($produit && $quantiteVendue > 0) {
-                    $stockActuel = $produit->getQuantiteStock();
-
-
-                    // Le LigneVenteListener gère automatiquement la soustraction du stock
-                    // et la création du MouvementStock de type "sortie"
-                    // Ici on vérifie juste que le stock n'est pas négatif après la soustraction
-                    if (($stockActuel - $quantiteVendue) < 0) {
-                        $this->addFlash('danger', 'Stock insuffisant pour ' . $produit->getNom() .
-                            ' (disponible: ' . $stockActuel . ', demandé: ' . $quantiteVendue . ')');
-                        return $this->render('admin/vente/add_lignes.html.twig', [
-                            'form' => $form,
-                            'vente' => $vente
-                        ]);
-                    }
-
-                    // ✅ 3. Soustraire la quantité du produit
-                    $produit->setQuantiteStock($stockActuel - $quantiteVendue);
-                    $detailsStock[] = $produit->getNom() . ' (-' . $quantiteVendue . ')';
-
-
-                    // ✅ 4. Créer le MouvementStock de type "sortie"
-                    $mouvement = new \App\Entity\MouvementStock();
-                    $mouvement->setProduit($produit);
-                    $mouvement->setTypeMouvement('sortie');
-                    $mouvement->setQuantite($quantiteVendue);
-                    $mouvement->setDate(new DateTime());
-
-                    $em->persist($mouvement);
-                }
-            }
-
-            // ✅ 5. Gérer la facture
-            $facture = $factureRepository->findOneBy(['vente' => $vente]);
-
-            if (!$facture) {
-                // Créer la facture si elle n'existe pas (première sauvegarde avec lignes)
-                $currentYear = (new DateTime())->format('Y');
-                $lastFacture = $factureRepository->findOneBy([], ['id' => 'DESC']);
-                $lastId = $lastFacture ? $lastFacture->getId() + 1 : 1;
-                $codeFacture = 'F-' . $lastId . '/' . $currentYear;
-
-                $facture = new Facture();
-                $facture->setVente($vente);
-                $facture->setCodeFacture($codeFacture);
-                $facture->setMontantRegle(0);
-                $facture->setMontantRestant($montantTotal);
-                $facture->setStatut('Non réglé');
-
-                $em->persist($facture);
-                $message = 'Vente enregistrée avec succès ! ' . $stocksModifies . ' produit(s) ont été soustrait du stock et la facture a été créée.';
-            } else {
-                // Mettre à jour le montant restant de la facture existante
-                $facture->setMontantRestant($montantTotal);
-                $message = 'Vente mise à jour ! ' . $stocksModifies . ' produit(s) mis en mouvement et la facture a été recalculée.';
-            }
-
-            // Persister tous les mouvements de stock (gérés par le LigneVenteListener)
+            $em->persist($ligne);
+            $em->persist($mouvement);
             $em->flush();
 
-            $this->addFlash('success', $message);
-            return $this->redirectToRoute('app_admin_vente_index');
+            $this->addFlash('success', 'Ligne ajoutée avec succès !');
+            return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
+        }
+
+        // Calculer le total actuel
+        $montantTotal = 0;
+        foreach ($vente->getLignes() as $ligne) {
+            $montantTotal += $ligne->getTotalLigne();
         }
 
         return $this->render('admin/vente/add_lignes.html.twig', [
             'form' => $form,
-            'vente' => $vente
+            'vente' => $vente,
+            'montantTotal' => $montantTotal
         ]);
+    }
+
+    #[Route('/{id}/lignes/{ligneId}/delete', name: 'app_admin_vente_delete_ligne', methods: ['POST'])]
+    public function deleteLigne(
+        Vente $vente,
+        int $ligneId,
+        EntityManagerInterface $em
+    ): Response {
+        $ligne = $em->getRepository(LigneVente::class)->find($ligneId);
+
+        if ($ligne && $ligne->getVente()->getId() === $vente->getId()) {
+            // Remettre le stock
+            $produit = $ligne->getProduit();
+            $produit->setQuantiteStock($produit->getQuantiteStock() + $ligne->getQuantite());
+
+            $em->remove($ligne);
+            $em->flush();
+
+            $this->addFlash('success', 'Ligne supprimée');
+        }
+
+        return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
+    }
+
+    #[Route('/{id}/finaliser', name: 'app_admin_vente_finaliser', methods: ['POST'])]
+    public function finaliser(
+        Vente $vente,
+        FactureRepository $factureRepository,
+        EntityManagerInterface $em
+    ): Response {
+        if (count($vente->getLignes()) === 0) {
+            $this->addFlash('warning', 'Ajoutez au moins une ligne avant de finaliser.');
+            return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
+        }
+
+        // Calculer le montant total
+        $montantTotal = 0;
+        foreach ($vente->getLignes() as $ligne) {
+            $montantTotal += $ligne->getTotalLigne();
+        }
+
+        // Créer ou mettre à jour la facture
+        $facture = $factureRepository->findOneBy(['vente' => $vente]);
+
+        if (!$facture) {
+            $currentYear = (new DateTime())->format('Y');
+            $lastFacture = $factureRepository->findOneBy([], ['id' => 'DESC']);
+            $lastId = $lastFacture ? $lastFacture->getId() + 1 : 1;
+            $codeFacture = 'F-' . $lastId . '/' . $currentYear;
+
+            $facture = new Facture();
+            $facture->setVente($vente);
+            $facture->setCodeFacture($codeFacture);
+            $facture->setMontantRegle(0);
+            $facture->setMontantRestant($montantTotal);
+            $facture->setStatut('Non réglé');
+
+            $em->persist($facture);
+        } else {
+            $facture->setMontantRestant($montantTotal);
+        }
+
+        $em->flush();
+
+        $this->addFlash('success', 'Vente finalisée et facture créée !');
+        return $this->redirectToRoute('app_admin_vente_index');
     }
 
     #[Route('/{id}', name: 'app_admin_vente_delete', methods: ['DELETE'])]
@@ -177,7 +204,7 @@ class VenteController extends AbstractController
                 $quantiteVendue = $ligne->getQuantite() ?? 0;
                 $produit->setQuantiteStock($produit->getQuantiteStock() + $quantiteVendue);
                 // Supprimer les mouvements de stock directement associés à cette ligne
-                $mouvements = $msr->mouvementProduits($produit);
+                $mouvements = $msr->findMouvementsByVente($vente);
                 foreach ($mouvements as $mouvement) {
                     $em->remove($mouvement);
                 }
@@ -196,6 +223,21 @@ class VenteController extends AbstractController
 
         $this->addFlash('success', 'La vente a bien été supprimée, les stocks ont été remis à jour et la facture a été supprimée.');
         return $this->redirectToRoute('app_admin_vente_index');
+    }
+
+    #[Route('/{id}/details', name: 'app_admin_vente_show', methods: ['GET'])]
+    public function show(Vente $vente): Response
+    {
+        // Calculer le montant total
+        $montantTotal = 0;
+        foreach ($vente->getLignes() as $ligne) {
+            $montantTotal += $ligne->getTotalLigne() ?? ($ligne->getPrixUnitaire() * $ligne->getQuantite());
+        }
+
+        return $this->render('admin/vente/show.html.twig', [
+            'vente' => $vente,
+            'montantTotal' => $montantTotal
+        ]);
     }
 
     #[Route('/{id}/facture', name: 'app_admin_vente_facture', methods: ['GET'])]

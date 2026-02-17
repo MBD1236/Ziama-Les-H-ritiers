@@ -1,0 +1,152 @@
+{% extends "admin/base.html.twig" %}
+
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_admin_vente_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active">Détails</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Détails de la vente</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        
+        {# Informations générales #}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="ri-shopping-cart-line"></i> Vente {{ vente.codeVente }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="150">Code Vente:</th>
+                                <td><span class="badge bg-dark">{{ vente.codeVente }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Client:</th>
+                                <td>
+                                    <strong>{{ vente.client.nom }}</strong><br>
+                                    <small class="text-muted"><i class="ri-phone-line"></i> {{ vente.client.telephone }}</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Employé:</th>
+                                <td>{{ vente.user.username }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="150">Date:</th>
+                                <td>{{ vente.dateVente|date('d/m/Y à H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Mode de paiement:</th>
+                                <td><span class="badge bg-secondary">{{ vente.modePaiement }}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Statut:</th>
+                                <td>
+                                    {% if vente.statut == 'Non réglé' %}
+                                        <span class="badge bg-danger">{{ vente.statut }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ vente.statut }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Détails des lignes de vente #}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-file-list-line"></i> Produits vendus</h5>
+            </div>
+            <div class="card-body">
+                {% if vente.lignes|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Produit</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Total ligne</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, ligne in vente.lignes %}
+                                    <tr>
+                                        <td>{{ key + 1 }}</td>
+                                        <td>
+                                            <strong>{{ ligne.produit.nom }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">{{ ligne.quantite }}</span>
+                                        </td>
+                                        <td class="text-end">{{ ligne.prixUnitaire|number_format(0, ',', ' ') }} GNF</td>
+                                        <td class="text-end fw-bold">
+                                            {{ (ligne.totalLigne ?? (ligne.prixUnitaire * ligne.quantite))|number_format(0, ',', ' ') }} GNF
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th colspan="4" class="text-end">MONTANT TOTAL</th>
+                                    <th class="text-end text-primary">
+                                        {{ montantTotal|number_format(0, ',', ' ') }} GNF
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="ri-alert-line"></i> Aucun produit n'a été ajouté à cette vente.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Actions #}
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="d-flex gap-2">
+                    <a href="{{ path('app_admin_vente_index') }}" class="btn btn-secondary">
+                        <i class="ri-arrow-left-line"></i> Retour à la liste
+                    </a>
+                    <a href="{{ path('app_admin_vente_facture', {'id': vente.id}) }}" class="btn btn-info">
+                        <i class="ri-file-text-line"></i> Voir la facture
+                    </a>
+                    {% if vente.lignes|length == 0 %}
+                        <a href="{{ path('app_admin_vente_add_lignes', {'id': vente.id}) }}" class="btn btn-primary">
+                            <i class="ri-add-line"></i> Ajouter des produits
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

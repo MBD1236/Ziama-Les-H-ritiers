@@ -48,35 +48,70 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for k, c in ventes  %}
+                            {% for k, vente in ventes %}
                                 <tr>
                                     <td>{{ k+1 }}</td>
-                                    <td>{{ c.codeVente }}</td>
-                                    <td>{{ c.client.nom }} - {{ c.client.telephone }}</td>
-                                    {% set first = c.getLignes()|first %}
-                                    <td>{{ first ? first.produit.nom : '' }}</td>
-                                    <td>{{ first ? first.quantite : '' }}</td>
+                                    <td>{{ vente.codeVente }}</td>
+                                    <td>{{ vente.client.nom }} - {{ vente.client.telephone }}</td>
+                                    
+                                    {# Afficher TOUS les produits #}
+                                    <td>
+                                        {% if vente.lignes|length > 0 %}
+                                            {% for ligne in vente.lignes %}
+                                                <span class="badge bg-primary">{{ ligne.produit.nom }} (×{{ ligne.quantite }})</span>
+                                                {% if not loop.last %}<br>{% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="text-muted">Aucun produit</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    {# Afficher TOUTES les quantités #}
+                                    <td>
+                                        {% if vente.lignes|length > 0 %}
+                                            {% for ligne in vente.lignes %}
+                                                <span class="badge bg-primary">{{ ligne.quantite }}</span>
+                                                {% if not loop.last %}<br>{% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    
+                                    {# Montant total (somme de toutes les lignes) #}
                                     {% set montant = 0 %}
-                                    {% for l in c.lignes %}
-                                        {% set montant = montant + (l.totalLigne ? l.totalLigne : (l.prixUnitaire * l.quantite)) %}
+                                    {% for ligne in vente.lignes %}
+                                        {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.prixUnitaire * ligne.quantite)) %}
                                     {% endfor %}
-                                    <td class="fw-bold">{{ montant }} GNF</td>
-                                    <td>{{ c.modePaiement }}</td>
-                                    <td>{{ c.dateVente|date('Y-m-d H:i')}}</td>
-                                    <td>{{ c.user.username }}</td>
-                                    {% if c.statut == 'Non réglé' %}
-                                    <td class="fw-bold" style="color:red">{{ c.statut }}</td>
+                                    <td class="fw-bold">{{ montant|number_format(0, ',', ' ') }} GNF</td>
+                                    
+                                    <td>{{ vente.modePaiement }}</td>
+                                    <td>{{ vente.dateVente|date('d/m/Y H:i')}}</td>
+                                    <td>{{ vente.user.username }}</td>
+                                    
+                                    {% if vente.statut == 'Non réglé' %}
+                                        <td class="fw-bold text-danger">{{ vente.statut }}</td>
                                     {% else %}
-                                    <td class="fw-bold">{{ c.statut }}</td>
+                                        <td class="fw-bold text-success">{{ vente.statut }}</td>
                                     {% endif %}
+                                    
                                     <td class="d-flex gap-2 justify-content-end w-100 align-items-center">
-                                        {# <a href="{{ path('app_admin_vente_edit', {'id': c.id}) }}" class="bi-pencil"></a> #}
-                                        <a href="{{ path('app_admin_vente_facture', {'id': c.id}) }}" class="bi-eye" title="Voir la facture"></a>
+                                        <a href="{{ path('app_admin_vente_show', {'id': vente.id}) }}" 
+                                                    class="btn btn-sm btn-primary" 
+                                                    title="Voir les détails">
+                                                    <i class="bi-info-circle"></i>
+                                        </a>
                                         
-                                        <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
+                                        <a href="{{ path('app_admin_vente_facture', {'id': vente.id}) }}" 
+                                        class="btn btn-sm btn-primary bi-eye" 
+                                        title="Voir la facture"></a>
+                                        
+                                        <button type="button" 
+                                                class="btn btn-danger btn-sm bi-trash" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#danger-alert-modal-{{ k }}"></button>
 
-
-                                        <!-- Danger Alert Modal -->
+                                        {# Modal suppression (inchangé) #}
                                         <div id="danger-alert-modal-{{ k }}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                                             <div class="modal-dialog modal-sm">
                                                 <div class="modal-content modal-filled bg-danger">
@@ -84,18 +119,17 @@
                                                         <div class="text-center">
                                                             <i class="ri-close-circle-line h1"></i>
                                                             <h4 class="mt-2">Suppression!</h4>
-                                                            <p class="mt-3">Voulez-vous vraiment supprimer cet enregistrement ?.</p>
-                                                            <form action="{{ path('app_admin_vente_delete', {'id': c.id}) }}" method="post">
+                                                            <p class="mt-3">Voulez-vous vraiment supprimer cette vente ?</p>
+                                                            <form action="{{ path('app_admin_vente_delete', {'id': vente.id}) }}" method="post">
                                                                 <input type="hidden" name="_method" value="DELETE">
                                                                 <button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Non</button>
                                                                 <button type="submit" class="btn btn-light">Oui</button>
                                                             </form>
                                                         </div>
                                                     </div>
-                                                </div><!-- /.modal-content -->
-                                            </div><!-- /.modal-dialog -->
-                                        </div><!-- /.modal -->
-                                        
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

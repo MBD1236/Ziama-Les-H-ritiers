@@ -37,9 +37,10 @@
                                 <th>N°</th>
                                 <th>Nom</th>
                                 <th>Catégorie</th>
-                                <th>Quantité en Stock</th>
-                                <th>Prix de Vente</th>
-                                <th>Seuil Alerte</th>
+                                <th>Prix d'achat</th>
+                                <th>Prix de vente</th>
+                                <th>Quantité dispo</th>
+                                <th>Seuil d'alerte</th>
                                 <th>Etat du stock</th>
                                 <th class="text-center">Actions</th>
                             </tr>
@@ -50,8 +51,9 @@
                                     <td>{{ k+1 }}</td>
                                     <td>{{ b.nom }}</td>
                                     <td>{{ b.categorie.nom }}</td>
-                                    <td class="fw-bold">{{ b.quantiteStock }}</td>
+                                    <td>{{ b.prixAchat }} GNF</td>
                                     <td>{{ b.prixVente }} GNF</td>
+                                    <td class="fw-bold">{{ b.quantiteStock }}</td>
                                     <td>{{ b.seuilAlerte }}</td>
                                     {% if b.quantiteStock < b.seuilAlerte %}
                                         <td><span class="badge bg-danger">Alerte</span></td>

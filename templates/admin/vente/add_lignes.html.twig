@@ -7,10 +7,10 @@
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
                     <li class="breadcrumb-item"><a href="{{ path('app_admin_vente_index') }}">Ventes</a></li>
-                    <li class="breadcrumb-item active">Ajouter les lignes</li>
+                    <li class="breadcrumb-item active">Nouvelle ligne</li>
                 </ol>
             </div>
-            <h4 class="page-title">Ajout des lignes de vente</h4>
+            <h4 class="page-title">Enregistrement d'une nouvelle ligne de produit</h4>
         </div>
     </div>
 </div>
@@ -19,143 +19,101 @@
 <div class="row">
     <div class="col-md-12">
         {% include "admin/partials/_flash.html.twig" %}
+
         <div class="card">
             <div class="card-header">
-                <h4 class="header-title">
-                    Vente: <span class="badge bg-primary">{{ vente.codeVente }}</span> 
+                <h4>Vente: <span class="badge bg-primary">{{ vente.codeVente }}</span> 
                     | Client: <span class="badge bg-info">{{ vente.client.nom }}</span>
                 </h4>
             </div>
             <div class="card-body">
-                <div class="alert alert-info mb-4">
-                    <i class="ri-information-line"></i> 
-                    <strong>Étape 2:</strong> Ajoutez les produits vendus ci-dessous. Vous pouvez ajouter plusieurs lignes.
+                {# Formulaire d'ajout de ligne #}
+                <div class="card mb-4 bg-light">
+                    <div class="card-body">
+                        <h5><i class="ri-add-line"></i> Ajouter une ligne</h5>
+                        {{ form_start(form) }}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {{ form_row(form.produit) }}
+                                </div>
+                                <div class="col-md-2">
+                                    {{ form_row(form.quantite) }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ form_row(form.prixUnitaire) }}
+                                </div>
+                                <div class="col-md-3" style="padding-top: 6.5px !important;">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="ri-check-line"></i> Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
                 </div>
 
-                {{ form_start(form, {'attr': {'class': 'form-group'}}) }}
-                
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <strong>Client:</strong> {{ vente.client.nom }}
-                    </div>
-                    <div class="col-6">
-                        <strong>Employé:</strong> {{ vente.user.username }}
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <strong>Mode de paiement:</strong> {{ vente.modePaiement }}
-                    </div>
-                    <div class="col-6">
-                        <strong>Date:</strong> {{ vente.dateVente|date('d/m/Y H:i') }}
-                    </div>
-                </div>
-
-                <hr>
-
-                <h5 class="mb-3">
-                    <i class="ri-shopping-cart-line"></i> Lignes de vente
-                </h5>
-                <div class="table-responsive mb-3">
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Produit</th>
-                                <th>Quantité</th>
-                                <th>Prix unitaire (GNF)</th>
-                                <th>Total ligne (GNF)</th>
-                                <th class="text-center" style="width: 100px;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lignes-container" data-prototype="{{ form_widget(form.lignes.vars.prototype) | e('html_attr') }}">
-                            {% for ligne in form.lignes %}
-                                <tr class="ligne-item">
-                                    <td>{{ form_widget(ligne.produit, {'attr': {'class': 'form-select form-select-sm'}}) }}</td>
-                                    <td>{{ form_widget(ligne.quantite, {'attr': {'class': 'form-control form-control-sm quantite-input'}}) }}</td>
-                                    <td>{{ form_widget(ligne.prixUnitaire, {'attr': {'class': 'form-control form-control-sm prix-input'}}) }}</td>
-                                    <td>{{ form_widget(ligne.totalLigne, {'attr': {'class': 'form-control form-control-sm total-input', 'readonly': true}}) }}</td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-danger btn-sm btn-remove-ligne">
-                                            <i class="ri-trash-line"></i>
-                                        </button>
-                                    </td>
+                {# Liste des lignes existantes #}
+                <h5>Lignes de vente ({{ vente.lignes|length }})</h5>
+                {% if vente.lignes|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <button type="button" class="btn btn-success btn-sm mb-4" id="add-ligne">
-                    <i class="ri-add-line"></i> Ajouter une ligne
-                </button>
+                            </thead>
+                            <tbody>
+                                {% set total = 0 %}
+                                {% for ligne in vente.lignes %}
+                                    {% set total = total + ligne.totalLigne %}
+                                    <tr>
+                                        <td>{{ ligne.produit.nom }}</td>
+                                        <td>{{ ligne.quantite }}</td>
+                                        <td>{{ ligne.prixUnitaire|number_format(0, ',', ' ') }} GNF</td>
+                                        <td>{{ ligne.totalLigne|number_format(0, ',', ' ') }} GNF</td>
+                                        <td>
+                                            <form method="post" 
+                                                  action="{{ path('app_admin_vente_delete_ligne', {
+                                                      'id': vente.id, 
+                                                      'ligneId': ligne.id
+                                                  }) }}" 
+                                                  style="display:inline"
+                                                  onsubmit="return confirm('Supprimer cette ligne ?')">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr class="table-info">
+                                    <th colspan="3" class="text-end">TOTAL</th>
+                                    <th>{{ total|number_format(0, ',', ' ') }} GNF</th>
+                                    <th></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <hr>
-
-                <div class="row">
-                    <div class="col-auto">
+                    <hr>
+                    <form method="post" action="{{ path('app_admin_vente_finaliser', {'id': vente.id}) }}">
                         <button type="submit" class="btn btn-primary">
-                            <i class="ri-check-line"></i> Finir et créer la facture
+                            <i class="ri-check-line"></i> Finaliser et créer la facture
                         </button>
-                    </div>
-                    <div class="col-auto">
                         <a href="{{ path('app_admin_vente_index') }}" class="btn btn-secondary">
-                            <i class="ri-close-line"></i> Annuler
+                            <i class="ri-close-line"></i> Retour
                         </a>
-                    </div>
-                </div>
-                
-                {{ form_end(form) }}
+                    </form>
+                {% else %}
+                    <p class="text-muted">Aucune ligne ajoutée pour le moment.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById('add-ligne').addEventListener('click', function(e) {
-    e.preventDefault();
-    const container = document.getElementById('lignes-container');
-    const index = container.querySelectorAll('tr.ligne-item').length;
-    const prototype = container.getAttribute('data-prototype');
-    const newForm = prototype.replace(/__name__/g, index);
-    
-    const newRow = document.createElement('tr');
-    newRow.className = 'ligne-item';
-    newRow.innerHTML = newForm;
-    container.appendChild(newRow);
-    
-    attachCalculEvent(newRow);
-    attachRemoveEvent(newRow.querySelector('.btn-remove-ligne'));
-});
-
-function attachCalculEvent(row) {
-    const quantiteInput = row.querySelector('.quantite-input');
-    const prixInput = row.querySelector('.prix-input');
-    const totalInput = row.querySelector('.total-input');
-    
-    const updateTotal = function() {
-        const quantite = parseInt(quantiteInput.value) || 0;
-        const prix = parseInt(prixInput.value) || 0;
-        totalInput.value = quantite * prix;
-    };
-    
-    quantiteInput.addEventListener('change', updateTotal);
-    quantiteInput.addEventListener('input', updateTotal);
-    prixInput.addEventListener('change', updateTotal);
-    prixInput.addEventListener('input', updateTotal);
-}
-
-function attachRemoveEvent(btn) {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        this.closest('tr.ligne-item').remove();
-    });
-}
-
-// Attach events to existing rows
-document.querySelectorAll('tr.ligne-item').forEach(row => {
-    attachCalculEvent(row);
-    attachRemoveEvent(row.querySelector('.btn-remove-ligne'));
-});
-</script>
-{% endblock body %}
+{% endblock %}

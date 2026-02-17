@@ -22,15 +22,6 @@ class VenteType extends AbstractType
                 'label' => 'Client',
                 'required' => true
             ])
-            ->add('lignes', CollectionType::class, [
-                'entry_type' => LigneVenteType::class,
-                'label' => 'Lignes de vente',
-                'required' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'attr' => ['class' => 'lignes-collection']
-            ])
             ->add('modePaiement', ChoiceType::class, [
                 'label' => 'Mode de paiement',
                 'required' => true,

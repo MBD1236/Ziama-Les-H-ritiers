@@ -43,7 +43,7 @@ class FactureController extends AbstractController
         $montantRestant = $montantActuel - $montantRegle;
         if ($montantRestant == 0) {
             $facture->setStatut('Réglé');
-            $facture->getCommande()->setStatut('Réglé');
+            $facture->getVente()->setStatut('Réglé');
         }
         $facture->setMontantRegle($montantRegle);
         $facture->setMontantRestant($montantRestant);

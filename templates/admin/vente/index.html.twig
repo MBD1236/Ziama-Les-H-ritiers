@@ -27,6 +27,7 @@
                     </form>
                 </div>
                 <div>
+                    <a type="button" href="{{ path('app_admin_vente_impression') }}" class="btn btn-primary"><span class="bi bi-printer" title="Imprimer la liste"></span></a>
                     <a href="{{ path('app_admin_vente_new')}}" class="btn btn-primary">Enregistrer une vente</a>
                 </div>
             </div>
@@ -40,7 +41,6 @@
                                 <th>Produit</th>
                                 <th>Quantité</th>
                                 <th>Montant</th>
-                                <th>Paiement</th>
                                 <th>Date</th>
                                 <th>Employé</th>
                                 <th>Statut</th>
@@ -81,11 +81,10 @@
                                     {# Montant total (somme de toutes les lignes) #}
                                     {% set montant = 0 %}
                                     {% for ligne in vente.lignes %}
-                                        {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.prixUnitaire * ligne.quantite)) %}
+                                        {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.produit.prixVente * ligne.quantite)) %}
                                     {% endfor %}
                                     <td class="fw-bold">{{ montant|number_format(0, ',', ' ') }} GNF</td>
                                     
-                                    <td>{{ vente.modePaiement }}</td>
                                     <td>{{ vente.dateVente|date('d/m/Y H:i')}}</td>
                                     <td>{{ vente.user.username }}</td>
                                     

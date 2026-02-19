@@ -21,10 +21,9 @@ class DepenseType extends AbstractType
                 'required' => true,
                 'choices' => [
                     'Sélectionner le type de depense' => null,
-                    'Entretien' => 'Entretien',
-                    'Panne' => 'Panne',
-                    'Carburant' => 'Carburant',
-                    'Imprevu' => 'Imprevu',
+                    'Transport' => 'Transport',
+                    'Electricité' => 'Electricité',
+                    'Salaires' => 'Salaires',
                     'Autres' => 'Autres',
                 ],
             ])

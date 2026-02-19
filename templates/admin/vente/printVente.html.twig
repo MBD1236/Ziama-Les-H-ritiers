@@ -1,0 +1,58 @@
+{% extends "printLayout/base.html.twig" %}
+{% block body %}
+
+<div class="container mt-5 border p-4 card">
+    <!-- En-tête -->
+    <div class="row text-center">
+        <div class="col-12">
+            <h3 class="text-primary fw-bold">LISTE DES VENTES</h3>
+            <h4 class="fw-bold">Ziama Les Héritiers</h4>
+            <p>Contact : 625556078</p>
+        </div>
+    </div>
+
+
+    <!-- Tableau des produits -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th class="text-bg-info">N°</th>
+                        <th class="text-bg-info">Code vente</th>
+                        <th class="text-bg-info">Client</th>
+                        <th class="text-bg-info">Employé</th>
+                        <th class="text-bg-info">Date vente</th>
+                        <th class="text-bg-info">Montant</th>
+                        <th class="text-bg-info">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k, vente in ventes %}
+                    <tr>
+                        <td>{{ k+1 }}</td>
+                        <td>{{ vente.codeVente }}</td>
+                        <td>{{ vente.client.nom }} - {{ vente.client.telephone }}</td>
+                        <td>{{ vente.user.username }}</td>
+                        <td>{{ vente.dateVente|date('Y-m-d H:i:s') }}</td>
+                        {# Montant total (somme de toutes les lignes) #}
+                        {% set montant = 0 %}
+                        {% for ligne in vente.lignes %}
+                            {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.produit.prixVente * ligne.quantite)) %}
+                        {% endfor %}
+                        <td class="fw-bold">{{ montant|number_format(0, ',', ' ') }} GNF</td>
+                        <td>{{ vente.statut }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        window.print();
+    }
+</script>
+{% endblock body %}

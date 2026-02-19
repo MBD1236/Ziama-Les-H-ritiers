@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/depense')]
+#[Route('/admin/depense')]
 class DepenseController extends AbstractController
 {
     #[Route('/', name: 'app_admin_depense_index', methods:['GET'])]
@@ -112,6 +112,15 @@ class DepenseController extends AbstractController
             'depenses' => $depenses,
             'query' => $query,
             'dep' => $dep
+        ]);
+    }
+
+    #[Route('/impression', name: 'app_admin_depense_impression', methods: ['GET'])]
+    public function printProduit(DepenseRepository $dr)
+    {
+        $depenses = $dr->findAll();
+        return $this->render('admin/depense/printDepense.html.twig', [
+            'depenses' => $depenses
         ]);
     }
 

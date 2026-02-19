@@ -35,6 +35,24 @@ class ProduitRepository extends ServiceEntityRepository
         );
     }
 
+    /** Produits en dessous du seuil d'alerte (bientôt en rupture) */
+    public function getProduitsEnRupture(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.quantiteStock <= p.seuilAlerte')
+            ->orderBy('p.quantiteStock', 'ASC')
+            ->getQuery()->getResult();
+    }
+
+    /** Nombre de produits en alerte */
+    public function countProduitsEnRupture(): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.quantiteStock <= p.seuilAlerte')
+            ->getQuery()->getSingleScalarResult();
+    }
+
     public function paginateProduitsWithSearch(string $query, int $page): PaginationInterface
     {
         return $this->paginator->paginate(

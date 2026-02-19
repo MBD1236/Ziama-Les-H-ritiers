@@ -35,19 +35,21 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/livraison, roles: [ROLE_ADMIN, ROLE_LIVREUR] }
-        - { path: ^/production/employe, roles: [ROLE_ADMIN, ROLE_PRODUCTEUR] }
-        - { path: ^/admin/accueil, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
-        - { path: ^/admin/accueil, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
-        - { path: ^/depense, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
-        - { path: ^/transaction/fournisseur, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
-        - { path: ^/caisse, roles: [ROLE_ADMIN, ROLE_COMPTABLE] }
-        - { path: ^/admin/cadeau, roles: [ROLE_ADMIN] }
-        - { path: ^/admin/bobine, roles: [ROLE_ADMIN] }
-        - { path: ^/admin/client, roles: [ROLE_ADMIN] }
-        - { path: ^/admin/facture, roles: [ROLE_ADMIN] }
-        - { path: ^/admin/reglement, roles: [ROLE_ADMIN] }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin/vente, roles: [ROLE_ADMIN, ROLE_EMPLOYE] }
+        - { path: ^/admin/produit, roles: [ROLE_ADMIN, ROLE_EMPLOYE] }
+        - { path: ^/admin/mouvement, roles: [ROLE_ADMIN, ROLE_EMPLOYE] }
+        - { path: ^/admin/client, roles: [ROLE_ADMIN, ROLE_EMPLOYE] }
+
+        # ── Admin seulement ──
+        - { path: ^/admin/facture, roles: ROLE_ADMIN }
+        - { path: ^/admin/reglement, roles: ROLE_ADMIN }
+        - { path: ^/admin/categorie, roles: ROLE_ADMIN }
+        - { path: ^/admin/depense, roles: ROLE_ADMIN }
+        - { path: ^/admin/caisse, roles: ROLE_ADMIN }
+        - { path: ^/admin/fournisseur, roles: ROLE_ADMIN }
+        - { path: ^/admin/livraison, roles: ROLE_ADMIN }
+        - { path: ^/admin/accueil, roles: ROLE_ADMIN }
+            # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

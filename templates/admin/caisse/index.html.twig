@@ -46,10 +46,10 @@
                             {% for k, c in caisses %}
                                 <tr>
                                     <td>{{ k+1 }}</td>
-                                    <td>{{ c.montant}}</td>
+                                    <td>{{ c.montant}} GNF</td>
                                     <td>{{ c.type }}</td>
                                     <td>{{ c.description }}</td>
-                                    <td>{{ c.date|date('Y-m-d') }}</td>
+                                    <td>{{ c.date|date('Y-m-d H:i:s') }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
                                         <a href="{{ path('app_admin_caisse_edit', {'id': c.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>

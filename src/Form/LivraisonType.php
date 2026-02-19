@@ -24,7 +24,7 @@ class LivraisonType extends AbstractType
                     $qty = $first ? $first->getQuantite() : 0;
                     $montant = 0;
                     foreach ($vente->getLignes() as $l) {
-                        $montant += $l->getTotalLigne() ?? ($l->getPrixUnitaire() * $l->getQuantite());
+                        $montant += $l->getTotalLigne() ?? ($l->getProduit()->getPrixVente() * $l->getQuantite());
                     }
                     return $vente->getCodeVente() . ' (' . $prod . ' : ' . $qty .' =>' . number_format($montant, 2, ',', ' ') . ' GNF) - ' . $vente->getClient()->getNom();
                 },

@@ -6,8 +6,8 @@
     <div class="row text-center">
         <div class="col-12">
             <h3 class="text-primary fw-bold">FACTURE DU CLIENT</h3>
-            <h4 class="fw-bold">Groupe Mandela</h4>
-            <p>Contact : 625081146</p>
+            <h4 class="fw-bold">Ziama Les Héritiers</h4>
+            <p>Contact : 625556078</p>
         </div>
     </div>
 
@@ -40,7 +40,7 @@
                     <tr>
                         <td>{{ ligne.produit.nom }}</td>
                         <td>{{ ligne.quantite }}</td>
-                        <td>{{ ligne.prixUnitaire }} GNF</td>
+                        <td>{{ ligne.produit.prixVente }} GNF</td>
                         <td>{{ ligne.totalLigne|number_format(2, ',', ' ') }} GNF</td>
                     </tr>
                     {% endfor %}

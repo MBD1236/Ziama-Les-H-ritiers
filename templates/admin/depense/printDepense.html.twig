@@ -1,0 +1,49 @@
+{% extends "printLayout/base.html.twig" %}
+{% block body %}
+
+<div class="container mt-5 border p-4 card">
+    <!-- En-tête -->
+    <div class="row text-center">
+        <div class="col-12">
+            <h3 class="text-primary fw-bold">LISTE DES DEPENSES</h3>
+            <h4 class="fw-bold">Ziama Les Héritiers</h4>
+            <p>Contact : 625556078</p>
+        </div>
+    </div>
+
+
+    <!-- Tableau des produits -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th class="text-bg-info">N°</th>
+                        <th class="text-bg-info">Type</th>
+                        <th class="text-bg-info">Montant</th>
+                        <th class="text-bg-info">Description</th>
+                        <th class="text-bg-info">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k, depense in depenses %}
+                    <tr>
+                        <td>{{ k+1 }}</td>
+                        <td>{{ depense.type }}</td>
+                        <td>{{ depense.montant }}</td>
+                        <td>{{ depense.description }}</td>
+                        <td>{{ depense.dateDepense|date('Y-m-d H:i:s')}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        window.print();
+    }
+</script>
+{% endblock body %}

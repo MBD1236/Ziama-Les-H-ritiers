@@ -27,6 +27,7 @@
                     </form>
                 </div>
                 <div>
+                    <a type="button" href="{{ path('app_admin_depense_impression') }}" class="btn btn-primary"><span class="bi bi-printer" title="Imprimer la liste"></span></a>
                     <a href="{{ path('app_admin_depense_new')}}" class="btn btn-primary">Enregistrer une depense</a>
                 </div>
             </div>
@@ -47,9 +48,9 @@
                                 <tr>
                                     <td>{{ k+1 }}</td>
                                     <td>{{ d.type }}</td>
-                                    <td>{{ d.montant }}GNF</td>
+                                    <td>{{ d.montant }} GNF</td>
                                     <td>{{ d.description }}</td>
-                                    <td>{{ d.dateDepense|date('Y-m-d') }}</td>
+                                    <td>{{ d.dateDepense|date('Y-m-d H:i:s') }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
                                         <a href="{{ path('app_admin_depense_edit', {'id': d.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>

@@ -25,13 +25,10 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         // Logique de redirection en fonction du rôle
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
             $targetPath = $this->urlGenerator->generate('app_admin_accueil_index');
-        }elseif(in_array('ROLE_COMPTABLE', $user->getRoles())) {
-            $targetPath = $this->urlGenerator->generate('app_admin_accueil_index');
-        }elseif(in_array('ROLE_PRODUCTEUR', $user->getRoles())) {
-            $targetPath = $this->urlGenerator->generate('app_admin_production_employe_index');
-        }
-        else {
-            $targetPath = $this->urlGenerator->generate('app_admin_livraison_index');
+        } elseif (in_array('ROLE_EMPLOYE', $user->getRoles())) {
+            $targetPath = $this->urlGenerator->generate('app_admin_vente_index');
+        } else {
+            $targetPath = $this->urlGenerator->generate('app_login');
         }
 
         return new RedirectResponse($targetPath);

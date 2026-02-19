@@ -9,7 +9,7 @@
                     <li class="breadcrumb-item active">Modification</li>
                 </ol>
             </div>
-            <h4 class="page-title">Modification des bobines</h4>
+            <h4 class="page-title">Modification des produits</h4>
         </div>
     </div>
 </div>
@@ -19,10 +19,20 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="header-title">Modification d'une bobine</h4>
+                <h4 class="header-title">Modification d'un produit</h4>
             </div>
             <div class="card-body">
-                {{form(form)}}
+                {{form_start(form)}}
+                <div class="row">
+                    <div class="col-md-6">{{ form_row(form.nom) }}</div>
+                    <div class="col-md-6">{{ form_row(form.categorie) }}</div>
+                    <div class="col-md-6">{{ form_row(form.prixAchat) }}</div>
+                    <div class="col-md-6">{{ form_row(form.prixVente) }}</div>
+                    <div class="col-md-6">{{ form_row(form.quantiteStock) }}</div>
+                    <div class="col-md-6">{{ form_row(form.seuilAlerte) }}</div>
+                    <div class="col-md-6">{{ form_row(form.save) }}</div>
+                </div>
+                {{form_end(form)}}
             </div>
         </div>
     </div>

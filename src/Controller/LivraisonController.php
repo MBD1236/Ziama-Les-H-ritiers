@@ -7,6 +7,7 @@ use App\Entity\Commande;
 use App\Entity\Facture;
 use App\Entity\Livraison;
 use App\Entity\ReglementFacture;
+use App\Entity\Vente;
 use App\Form\LivraisonType;
 use App\Repository\CommandeRepository;
 use App\Repository\FactureRepository;
@@ -50,8 +51,8 @@ class LivraisonController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             if ($user->getRoles() == ['ROLE_ADMIN']) {
-                $commande = $livraison->getCommande();
-                $verification = $livraisonRepository->findOneBy(['commande' => $commande]);
+                $commande = $livraison->getVente();
+                $verification = $livraisonRepository->findOneBy(['vente' => $commande]);
                 if ($verification) {
                     $this->addFlash('danger', 'Cette commande est deja livrée par un autre livreur.');
                     return $this->redirectToRoute('app_admin_livraison_index');
@@ -70,8 +71,8 @@ class LivraisonController extends AbstractController
                     $this->addFlash('danger', 'Veuillez choisir vos informations.');
                     return $this->redirectToRoute('app_admin_livraison_index');
                 }
-                $commande = $livraison->getCommande();
-                $verification = $livraisonRepository->findOneBy(['commande' => $commande]);
+                $commande = $livraison->getVente();
+                $verification = $livraisonRepository->findOneBy(['vente' => $commande]);
                 if ($verification) {
                     $this->addFlash('danger', 'Cette commande est deja livrée par un autre livreur.');
                     return $this->redirectToRoute('app_admin_livraison_index');
@@ -145,9 +146,9 @@ class LivraisonController extends AbstractController
     }
 
     #[Route('/{id}/facture', name: 'app_admin_livraison_facture', methods:['GET'])]
-    public function voirFacture(Commande $commande, FactureRepository $factureRepository): Response
+    public function voirFacture(Vente $commande, FactureRepository $factureRepository): Response
     {
-        $facture = $factureRepository->findOneBy(['commande' => $commande]);
+        $facture = $factureRepository->findOneBy(['vente' => $commande]);
         return $this->render('admin/livraison/facture.html.twig', [
             'facture' => $facture
         ]);
@@ -169,7 +170,7 @@ class LivraisonController extends AbstractController
         $montantRestant = $montantActuel - $montantRegle;
         if ($montantRestant == 0) {
             $facture->setStatut('Réglé');
-            $facture->getCommande()->setStatut('Réglé');
+            $facture->getVente()->setStatut('Réglé');
         }
         $facture->setMontantRegle($montantRegle);
         $facture->setMontantRestant($montantRestant);

@@ -12,6 +12,7 @@ use App\Repository\UserRepository;
 use App\Repository\VenteRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -20,74 +21,64 @@ use Symfony\UX\Chartjs\Model\Chart;
 #[Route('/admin/accueil')]
 class AccueilController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_accueil_index', methods:['GET'])]
-    public function index(ClientRepository $clientRepository, VenteRepository $venteRepository,
-    CaisseRepository $caisseRepository, UserRepository $userRepository, ChartBuilderInterface $chartBuilder,
-    LivraisonRepository $livraisonRepository, ProduitRepository $produitRepository,
-    DepenseRepository $depenseRepository, TransactionFournisseurRepository $tfr): Response
-    {
-        /**** */
-        $currentYear = new DateTime();
-        $year = $currentYear->format('Y');
-        $currentMonth = (int)$currentYear->format('m');
-        $day = $currentYear->format('d');
+    #[Route('/', name: 'app_admin_accueil_index', methods: ['GET'])]
+    public function index(
+        Request $request,
+        ClientRepository $clientRepository,
+        VenteRepository $venteRepository,
+        CaisseRepository $caisseRepository,
+        UserRepository $userRepository,
+        ChartBuilderInterface $chartBuilder,
+        LivraisonRepository $livraisonRepository,
+        ProduitRepository $produitRepository,
+        DepenseRepository $depenseRepository,
+        TransactionFournisseurRepository $tfr
+    ): Response {
 
-        if ($currentMonth == 1){
-            $months = [9, 10, 11, 12, 1];
-            $lastYear = (int)$year - 1;
+        // Récupère et efface le message de rupture
+        $ruptureMsg = $request->getSession()->get('rupture_notification');
+        if ($ruptureMsg) {
+            $request->getSession()->remove('rupture_notification'); //
+            $this->addFlash('warning', $ruptureMsg);
         }
-        elseif ($currentMonth == 2){
-            $months = [10, 11, 12, 1, 2];
-            $lastYear = (int)$year - 1;
-        }
-        elseif ($currentMonth == 3){
-            $months = [11, 12, 1, 2, 3];
-            $lastYear = (int)$year - 1;
-        }
-        elseif ($currentMonth == 4){
-            $months = [12, 1, 2, 3, 4];
-            $lastYear = (int)$year - 1;
-        }
-        else
+
+        /* Dates courantes  */
+        $now          = new DateTime();
+        $year         = (int) $now->format('Y');
+        $currentMonth = (int) $now->format('m');
+        $day          = (int) $now->format('d');
+
+        /* Période filtrée (formulaire date début/fin */
+        $dateDebutStr = $request->query->get('dateDebut', $now->format('Y-m-01'));
+        $dateFinStr   = $request->query->get('dateFin',   $now->format('Y-m-d'));
+        $dateDebut    = new DateTime($dateDebutStr);
+        $dateFin      = (new DateTime($dateFinStr))->setTime(23, 59, 59);
+
+        /* KPI cartes */
+        $livraisons             = $livraisonRepository->countAll();
+        $nombreLivraisonParJour = $livraisonRepository->countLivraisonsByDay($year, $currentMonth, $day);
+        $caisses                = $caisseRepository->getEtatCaisse();
+        $ventes                 = $venteRepository->countAll();
+        $nombreVenteParJour     = $venteRepository->countOrdersByDay($year, $currentMonth, $day);
+        $produits               = $produitRepository->countAll();
+        $nbProduitsEnRupture    = $produitRepository->countProduitsEnRupture();
+        $produitsEnRupture      = $produitRepository->getProduitsEnRupture();
+
+        /* CA, Bénéfice brut, Bénéfice net (période filtrée) */
+        $chiffreAffaires  = $venteRepository->getChiffreAffairesPeriode($dateDebut, $dateFin);
+        $beneficeBrut     = $venteRepository->getBeneficeBrutPeriode($dateDebut, $dateFin);
+        $totalCharges     = $depenseRepository->getSommeDepensesPeriode($dateDebut, $dateFin);
+        $beneficeNet      = $beneficeBrut - $totalCharges;
+
+        /* 5 derniers mois glissants  */
+        $lastYear = null;
+        if ($currentMonth <= 4) {
+            $months   = array_merge(range($currentMonth + 8, 12), range(1, $currentMonth));
+            $lastYear = $year - 1;
+        } else {
             $months = range($currentMonth - 4, $currentMonth);
-
-        /** Nombre de livraisons */
-        $livraisons = $livraisonRepository->countAll();
-        $nombreLivraisonParJour = $livraisonRepository->countLivraisonsByDay($year, $currentMonth,$day);
-        /** Etat de la caisse */
-        $caisses = $caisseRepository->getEtatCaisse();
-        /** Etat des ventes */
-        $ventes = $venteRepository->countAll();
-        $nombreVenteParJour = $venteRepository->countOrdersByDay($year, $currentMonth,$day);
-        /** Nombre d'employés */
-        $produits = $produitRepository->countAll();
-        // $nombreProductionParJour = $productionRepository->countProductionsByDay($year, $currentMonth, $day);
-        
-        $nombreVentesParMois = [];
-        $nombreLivraisonsParMois = [];
-        $sommeDepensesParMois = [];
-        $sommeTransactionsParMois = [];
-
-
-        
-        foreach ($months as $month) {
-            if ($month > $currentMonth) {
-                // Mois qui appartiennent à l'année précédente
-                $nombreVentesParMois[] = $venteRepository->countOrdersByMonth($lastYear, $month);
-                $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($lastYear, $month);
-                $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($lastYear, $month);
-                $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($lastYear, $month);
-            } else {
-                // Mois qui appartiennent à l'année en cours
-                $nombreVentesParMois[] = $venteRepository->countOrdersByMonth($year, $month);
-                $nombreLivraisonsParMois[] = $livraisonRepository->countLivraisonsByMonth($year, $month);
-                $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($year, $month);
-                $sommeTransactionsParMois[] = $tfr->countSumTransactionsByMonth($year, $month);
-            }
         }
-        
-        
-        // Construire le graphique
+
         $moisNoms = [
             1 => 'Janvier',
             2 => 'Février',
@@ -102,208 +93,250 @@ class AccueilController extends AbstractController
             11 => 'Novembre',
             12 => 'Décembre',
         ];
-        $moisLabels = [];
+
+        $moisLabels           = [];
+        $nombreVentesParMois  = [];
+        $sommeDepensesParMois = [];
+
         foreach ($months as $month) {
             $moisLabels[] = $moisNoms[$month];
+            $yr = ($lastYear && $month > $currentMonth) ? $lastYear : $year;
+            $nombreVentesParMois[]  = $venteRepository->countOrdersByMonth($yr, $month);
+            $sommeDepensesParMois[] = $depenseRepository->countSumDepensesByMonth($yr, $month);
         }
+
+        /* Chart 1 : Nombre de ventes par mois (bar)  */
         $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
         $chart->setData([
-            'labels' => $moisLabels, // Les labels deviennent les mois
-            'datasets' => [
-                [
-                    'label' => 'Ventes',
-                    'backgroundColor' => 'rgba(0, 255, 0, 0.4)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $nombreVentesParMois, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-                [
-                    'label' => 'Livraisons',
-                    'backgroundColor' => 'rgba(255, 0, 0, 0.4)',
-                    'borderColor' => 'rgba(255, 0, 0, 1)',
-                    'data' => $nombreLivraisonsParMois, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-            ],
+            'labels'   => $moisLabels,
+            'datasets' => [[
+                'label'           => 'Nombre de ventes',
+                'backgroundColor' => 'rgba(0, 200, 83, 0.5)',
+                'borderColor'     => 'rgba(0, 200, 83, 1)',
+                'data'            => $nombreVentesParMois,
+            ]],
         ]);
-        $chart->setOptions([
-            'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'stepSize' => 10, // Affiche les ticks par incréments de 1
-                    ],
-                ],
-            ],
-        ]);
+        $chart->setOptions(['maintainAspectRatio' => false]);
+
+        /* ── Chart 2 : CA vs Dépenses par mois (line) ───────────── */
+        $sommeVentesParMois = [];
+        foreach ($months as $month) {
+            $yr = ($lastYear && $month > $currentMonth) ? $lastYear : $year;
+            $sommeVentesParMois[] = $venteRepository->countSumOrdersByMonth($yr, $month);
+        }
+
         $chart2 = $chartBuilder->createChart(Chart::TYPE_LINE);
         $chart2->setData([
-            'labels' => $moisLabels, // Les labels deviennent les mois
+            'labels'   => $moisLabels,
             'datasets' => [
                 [
-                    'label' => 'Ventes',
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $nombreVentesParMois, // Les données dynamiques
-                    'tension' => 0.4,
+                    'label'           => 'CA (GNF)',
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.3)',
+                    'borderColor'     => 'rgba(54, 162, 235, 1)',
+                    'data'            => $sommeVentesParMois,
+                    'tension'         => 0.4,
+                    'fill'            => true,
                 ],
                 [
-                    'label' => 'Dépenses',
-                    'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
-                    'borderColor' => 'rgba(255, 0, 0, 0.4)',
-                    'data' => $sommeDepensesParMois, // Les données dynamiques
-                    'tension' => 0.4,
+                    'label'           => 'Dépenses (GNF)',
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.3)',
+                    'borderColor'     => 'rgba(255, 99, 132, 1)',
+                    'data'            => $sommeDepensesParMois,
+                    'tension'         => 0.4,
+                    'fill'            => true,
                 ],
-                [
-                    'label' => 'Transaction fournisseurs',
-                    'backgroundColor' => 'rgba(54, 29, 200, 0.4)',
-                    'borderColor' => 'rgba(54, 29, 200, 1)',
-                    'data' => $sommeTransactionsParMois, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-                
             ],
         ]);
         $chart2->setOptions([
             'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'stepSize' => 100000, // Affiche les ticks par incréments de 1
-                    ],
-                ],
-            ],
+            'scales' => ['y' => ['ticks' => ['stepSize' => 100000]]],
         ]);
-        
-        /*** */
-        $years = range($year - 4, $year);
-        $sommeVentesParAnnee = [];
+
+        /* ── Chart 3 : Vue annuelle (5 ans) ─────────────────────── */
+        $years                 = range($year - 4, $year);
+        $sommeVentesParAnnee   = [];
         $sommeDepensesParAnnee = [];
-        $sommeTransactionsParAnnee = [];
-        foreach ($years as $year) {
-            $sommeVentesParAnnee[] = $venteRepository->countSumOrdersByYear($year);
-            $sommeDepensesParAnnee[] = $depenseRepository->countSumDepensesByYear($year);
-            $sommeTransactionsParAnnee[] = $tfr->countSumTransactionsByYear($year);
+        foreach ($years as $y) {
+            $sommeVentesParAnnee[]   = $venteRepository->countSumOrdersByYear($y);
+            $sommeDepensesParAnnee[] = $depenseRepository->countSumDepensesByYear($y);
         }
+
         $chart3 = $chartBuilder->createChart(Chart::TYPE_LINE);
         $chart3->setData([
-            'labels' => $years, // Les labels deviennent les mois
+            'labels'   => $years,
             'datasets' => [
                 [
-                    'label' => 'Commandes',
+                    'label'           => 'CA annuel (GNF)',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $sommeVentesParAnnee, // Les données dynamiques
-                    'tension' => 0.4,
+                    'borderColor'     => 'rgba(54, 162, 235, 1)',
+                    'data'            => $sommeVentesParAnnee,
+                    'tension'         => 0.4,
                 ],
                 [
-                    'label' => 'Dépenses',
-                    'backgroundColor' => 'rgba(70, 123, 235, 0.4)',
-                    'borderColor' => 'rgba(70, 123, 235, 1)',
-                    'data' => $sommeDepensesParAnnee, // Les données dynamiques
-                    'tension' => 0.4,
+                    'label'           => 'Dépenses annuelles (GNF)',
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.4)',
+                    'borderColor'     => 'rgba(255, 99, 132, 1)',
+                    'data'            => $sommeDepensesParAnnee,
+                    'tension'         => 0.4,
                 ],
-                [
-                    'label' => 'Transactions',
-                    'backgroundColor' => 'rgba(54, 29, 200, 0.4)',
-                    'borderColor' => 'rgba(54, 29, 200, 1)',
-                    'data' => $sommeTransactionsParAnnee, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-                
             ],
         ]);
         $chart3->setOptions([
             'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'stepSize' => 100000, // Affiche les ticks par incréments de 1
-                    ],
-                ],
-            ],
+            'scales' => ['y' => ['ticks' => ['stepSize' => 500000]]],
         ]);
 
-        /** Recuperer seulement les utilisateurs qui ont le role ROLE_LIVREUR */
-        $utilisateurs = $userRepository->findAll();
-        $em = [];
-        foreach ($utilisateurs as $utilisateur) {
-            $verif = in_array("ROLE_LIVREUR", $utilisateur->getRoles());
-            if ($verif)
-                $em [] = $utilisateur;
-        }
-        $nombreLivraisons = [];
-        $nombreLivraisonsParAn = [];
-        foreach ($em as $e) {
-            $nombreLivraisons[] = $livraisonRepository->countLivraisonUserByMonth($e, $year, $month);
-            $nombreLivraisonsParAn[] = $livraisonRepository->countLivraisonUserByYear($e, $year);
-        }
-        $users = [];
-        foreach ($em as $u) {
-            $users [] = $u->getUsername();
-        }
-        $nomMois = $moisNoms[$month];
-        
+        /* ── Chart 4 : Top 5 produits les plus vendus (bar horizontal) */
+        $topProduits       = $venteRepository->getTopProduits(5);
+        $topProduitsLabels = array_column($topProduits, 'produit');
+        $topProduitsData   = array_column($topProduits, 'totalQuantite');
+
         $chart4 = $chartBuilder->createChart(Chart::TYPE_BAR);
         $chart4->setData([
-            'labels' => $users, // Les labels deviennent les mois
-            'datasets' => [
-                [
-                    'label' => $nomMois,
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.4)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'data' => $nombreLivraisons, // Les données dynamiques
-                    'tension' => 0.4,
+            'labels'   => $topProduitsLabels,
+            'datasets' => [[
+                'label'           => 'Quantité vendue',
+                'backgroundColor' => [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
                 ],
-            ],
+                'borderColor'     => [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                ],
+                'borderWidth'     => 1,
+                'data'            => $topProduitsData,
+            ]],
         ]);
         $chart4->setOptions([
             'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'stepSize' => 10, // Affiche les ticks par incréments de 1
-                    ],
-                ],
-            ],
+            'indexAxis'           => 'y',  // Horizontal
         ]);
-        $chart5 = $chartBuilder->createChart(Chart::TYPE_BAR);
+
+        /* ── Chart 5 : Répartition des charges par type (doughnut) ─ */
+        $depensesParType       = $depenseRepository->getDepensesParTypeParAnnee($year);
+        $depensesLabels        = array_column($depensesParType, 'type');
+        $depensesData          = array_column($depensesParType, 'total');
+        $depenseColors = [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(199, 199, 199, 0.7)',
+        ];
+
+        $chart5 = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
         $chart5->setData([
-            'labels' => $users, // Les labels deviennent les mois
-            'datasets' => [
-                [
-                    'label' => $year,
-                    'backgroundColor' => 'rgba(255, 0, 0, 0.4)',
-                    'borderColor' => 'rgba(255, 0, 0, 1)',
-                    'data' => $nombreLivraisonsParAn, // Les données dynamiques
-                    'tension' => 0.4,
-                ],
-            ],
+            'labels'   => $depensesLabels,
+            'datasets' => [[
+                'label'           => 'Charges par type',
+                'backgroundColor' => array_slice($depenseColors, 0, count($depensesLabels)),
+                'data'            => $depensesData,
+            ]],
         ]);
         $chart5->setOptions([
             'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'stepSize' => 10, // Affiche les ticks par incréments de 1
-                    ],
+            'plugins'             => ['legend' => ['position' => 'right']],
+        ]);
+
+        /* ── Chart 6 : Ventes par catégorie (pie) ───────────────── */
+        $ventesParCategorie = $venteRepository->getVentesParMoisEtCategorie($year);
+
+        // Agréger par catégorie (somme sur toute l'année)
+        $categorieMap = [];
+        foreach ($ventesParCategorie as $row) {
+            $cat = $row['categorie'] ?? 'Sans catégorie';
+            $categorieMap[$cat] = ($categorieMap[$cat] ?? 0) + $row['totalCA'];
+        }
+
+        $chart6 = $chartBuilder->createChart(Chart::TYPE_PIE);
+        $chart6->setData([
+            'labels'   => array_keys($categorieMap),
+            'datasets' => [[
+                'label'           => 'CA par catégorie',
+                'backgroundColor' => array_slice($depenseColors, 0, count($categorieMap)),
+                'data'            => array_values($categorieMap),
+            ]],
+        ]);
+        $chart6->setOptions([
+            'maintainAspectRatio' => false,
+            'plugins'             => ['legend' => ['position' => 'right']],
+        ]);
+
+        /* ── Livreurs ────────────────────────────────────────────── */
+        $utilisateurs = $userRepository->findAll();
+        $livreurs     = array_filter($utilisateurs, fn($u) => in_array('ROLE_LIVREUR', $u->getRoles()));
+        $livreurs     = array_values($livreurs);
+
+        $livreursNoms           = array_map(fn($u) => $u->getUsername(), $livreurs);
+        $nombreLivraisons       = [];
+        $nombreLivraisonsParAn  = [];
+        foreach ($livreurs as $e) {
+            $nombreLivraisons[]      = $livraisonRepository->countLivraisonUserByMonth($e, $year, $currentMonth);
+            $nombreLivraisonsParAn[] = $livraisonRepository->countLivraisonUserByYear($e, $year);
+        }
+
+        $chart7 = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart7->setData([
+            'labels'   => $livreursNoms,
+            'datasets' => [
+                [
+                    'label'           => $moisNoms[$currentMonth],
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
+                    'borderColor'     => 'rgba(54, 162, 235, 1)',
+                    'data'            => $nombreLivraisons,
+                ],
+                [
+                    'label'           => 'Année ' . $year,
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.5)',
+                    'borderColor'     => 'rgba(255, 99, 132, 1)',
+                    'data'            => $nombreLivraisonsParAn,
                 ],
             ],
         ]);
-
+        $chart7->setOptions([
+            'maintainAspectRatio' => false,
+            'scales'              => ['y' => ['ticks' => ['stepSize' => 10]]],
+        ]);
 
         return $this->render('admin/accueil/index.html.twig', [
-            'livraisons' => $livraisons,
+            // KPI
+            'livraisons'             => $livraisons,
             'nombreLivraisonParJour' => $nombreLivraisonParJour,
-            'ventes' => $ventes,
-            'produits' => $produits,
-            'nombreCommandeParJour' => $nombreVenteParJour,
-            'caisses' => $caisses,
-            'chart' => $chart,
-            'chart2' => $chart2,
-            'chart3' => $chart3,
-            'chart4' => $chart4,
-            'chart5' => $chart5,
+            'ventes'                 => $ventes,
+            'produits'               => $produits,
+            'nombreCommandeParJour'  => $nombreVenteParJour,
+            'caisses'                => $caisses,
+            'nbProduitsEnRupture'    => $nbProduitsEnRupture,
+            'produitsEnRupture'      => $produitsEnRupture,
+
+            // Financiers (période filtrée)
+            'chiffreAffaires'        => $chiffreAffaires,
+            'beneficeBrut'           => $beneficeBrut,
+            'beneficeNet'            => $beneficeNet,
+            'totalCharges'           => $totalCharges,
+            'dateDebut'              => $dateDebutStr,
+            'dateFin'                => $dateFinStr,
+
+            // Graphiques
+            'chart'                  => $chart,
+            'chart2'                 => $chart2,
+            'chart3'                 => $chart3,
+            'chart4'                 => $chart4,
+            'chart5'                 => $chart5,
+            'chart6'                 => $chart6,
+            'chart7'                 => $chart7,
+
+            // Top produits (tableau)
+            'topProduits'            => $topProduits,
         ]);
     }
 }

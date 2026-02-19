@@ -15,26 +15,15 @@ class LigneVenteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('produit', EntityType::class, [
-                'class' => Produit::class,
+            ->add('produit', ProduitAutocompleteField::class, [
                 'label' => 'Produit',
-                'required' => true,
-                'choice_label' => 'nom',
-                'placeholder' => 'Choisir un produit'
+                'required' => true
             ])
             ->add('quantite', IntegerType::class, [
                 'label' => 'Quantité',
                 'required' => true,
                 'attr' => [
                     'min' => 1,
-                    'step' => 1
-                ]
-            ])
-            ->add('prixUnitaire', IntegerType::class, [
-                'label' => 'Prix unitaire (GNF)',
-                'required' => true,
-                'attr' => [
-                    'min' => 0,
                     'step' => 1
                 ]
             ])

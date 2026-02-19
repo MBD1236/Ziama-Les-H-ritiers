@@ -26,9 +26,6 @@ class LigneVente
     private ?int $quantite = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    private ?int $prixUnitaire = null;
-
-    #[ORM\Column(type: Types::INTEGER)]
     private ?int $totalLigne = null;
 
 
@@ -71,16 +68,6 @@ class LigneVente
         return $this;
     }
 
-    public function getPrixUnitaire(): ?int
-    {
-        return $this->prixUnitaire;
-    }
-
-    public function setPrixUnitaire(int $prixUnitaire): static
-    {
-        $this->prixUnitaire = $prixUnitaire;
-        return $this;
-    }
 
     public function getTotalLigne(): ?int
     {

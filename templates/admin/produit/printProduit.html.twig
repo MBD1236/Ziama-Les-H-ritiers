@@ -1,0 +1,53 @@
+{% extends "printLayout/base.html.twig" %}
+{% block body %}
+
+<div class="container mt-5 border p-4 card">
+    <!-- En-tête -->
+    <div class="row text-center">
+        <div class="col-12">
+            <h3 class="text-primary fw-bold">LISTE DES PRODUITS</h3>
+            <h4 class="fw-bold">Ziama Les Héritiers</h4>
+            <p>Contact : 625556078</p>
+        </div>
+    </div>
+
+
+    <!-- Tableau des produits -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th class="text-bg-info">N°</th>
+                        <th class="text-bg-info">Nom</th>
+                        <th class="text-bg-info">Catégorie</th>
+                        <th class="text-bg-info">Prix d'achat</th>
+                        <th class="text-bg-info">Prix de vente</th>
+                        <th class="text-bg-info">Quantité en stock</th>
+                        <th class="text-bg-info">Seuil d'alerte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k, produit in produits %}
+                    <tr>
+                        <td>{{ k+1 }}</td>
+                        <td>{{ produit.nom }}</td>
+                        <td>{{ produit.categorie.nom }}</td>
+                        <td>{{ produit.prixAchat }}</td>
+                        <td>{{ produit.prixVente }}</td>
+                        <td>{{ produit.quantiteStock }}</td>
+                        <td>{{ produit.seuilAlerte }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        window.print();
+    }
+</script>
+{% endblock body %}

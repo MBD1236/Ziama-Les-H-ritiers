@@ -46,7 +46,7 @@
                                 <td>{{ k+1 }}</td>
                                 <td>{{ r.facture.codeFacture }}</td>
                                 <td>{{ r.modeReglement }}</td>
-                                <td>{{ r.montantRegle }}</td>
+                                <td>{{ r.montantRegle }} GNF</td>
                                 <td>{{ r.date|date('Y-m-d') }}</td>
                                 <td>
                                     <a type="button" href="{{ path('app_admin_reglement_impression', {'id': r.id}) }}" class="btn btn-primary btn-sm"><span class="bi bi-printer" title="Imprimer le recu"></span></a>

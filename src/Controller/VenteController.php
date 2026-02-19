@@ -35,11 +35,17 @@ class VenteController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em, VenteRepository $venteRepository): Response
     {
         $vente = new Vente();
-        $form = $this->createForm(VenteType::class, $vente);
+
+        // Si admin, on affiche le champ user dans le form
+        // Si employé, on passe une option pour cacher le champ
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+
+        $form = $this->createForm(VenteType::class, $vente, [
+            'show_user' => $isAdmin  // on passe l'option au formulaire
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Générer le code vente
             $currentYear = (new DateTime())->format('Y');
             $lastVente = $venteRepository->findOneBy([], ['id' => 'DESC']);
             $lastId = $lastVente ? $lastVente->getId() + 1 : 1;
@@ -49,7 +55,11 @@ class VenteController extends AbstractController
             $vente->setStatut('Non réglé');
             $vente->setDateVente(new DateTime());
 
-            // Enregistrer la vente SANS facture pour le moment
+            // Si employé, on force l'utilisateur connecté
+            if (!$isAdmin) {
+                $vente->setUser($this->getUser());
+            }
+
             $em->persist($vente);
             $em->flush();
 
@@ -66,7 +76,6 @@ class VenteController extends AbstractController
     #[Route('/{id}/lignes/add', name: 'app_admin_vente_add_lignes', methods: ['GET', 'POST'])]
     public function addLignes(
         Vente $vente,
-        FactureRepository $factureRepository,
         Request $request,
         EntityManagerInterface $em
     ): Response {
@@ -80,8 +89,7 @@ class VenteController extends AbstractController
             $ligne->setVente($vente);
             $ligne->setProduit($ligne->getProduit());
             $ligne->setQuantite($ligne->getQuantite());
-            $ligne->setPrixUnitaire($ligne->getPrixUnitaire());
-            $ligne->setTotalLigne($ligne->getQuantite() * $ligne->getPrixUnitaire());
+            $ligne->setTotalLigne($ligne->getQuantite() * $ligne->getProduit()->getPrixVente());
 
             // Vérifier le stock
             $produit = $ligne->getProduit();
@@ -99,15 +107,8 @@ class VenteController extends AbstractController
             // Mettre à jour le stock
             $produit->setQuantiteStock($stockActuel - $ligne->getQuantite());
 
-            // Créer le mouvement de stock
-            $mouvement = new MouvementStock();
-            $mouvement->setProduit($produit);
-            $mouvement->setTypeMouvement('sortie');
-            $mouvement->setQuantite($ligne->getQuantite());
-            $mouvement->setDate(new DateTime());
 
             $em->persist($ligne);
-            $em->persist($mouvement);
             $em->flush();
 
             $this->addFlash('success', 'Ligne ajoutée avec succès !');
@@ -140,6 +141,8 @@ class VenteController extends AbstractController
             $produit = $ligne->getProduit();
             $produit->setQuantiteStock($produit->getQuantiteStock() + $ligne->getQuantite());
 
+
+
             $em->remove($ligne);
             $em->flush();
 
@@ -160,10 +163,20 @@ class VenteController extends AbstractController
             return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
         }
 
+
         // Calculer le montant total
         $montantTotal = 0;
         foreach ($vente->getLignes() as $ligne) {
             $montantTotal += $ligne->getTotalLigne();
+
+            // Créer le mouvement de stock
+            $mouvement = new MouvementStock();
+            $mouvement->setProduit($ligne->getProduit());
+            $mouvement->setTypeMouvement('sortie');
+            $mouvement->setQuantite($ligne->getQuantite());
+            $mouvement->setDate(new DateTime());
+
+            $em->persist($mouvement);
         }
 
         // Créer ou mettre à jour la facture
@@ -231,7 +244,7 @@ class VenteController extends AbstractController
         // Calculer le montant total
         $montantTotal = 0;
         foreach ($vente->getLignes() as $ligne) {
-            $montantTotal += $ligne->getTotalLigne() ?? ($ligne->getPrixUnitaire() * $ligne->getQuantite());
+            $montantTotal += $ligne->getTotalLigne() ?? ($ligne->getProduit()->getPrixVente() * $ligne->getQuantite());
         }
 
         return $this->render('admin/vente/show.html.twig', [
@@ -262,6 +275,16 @@ class VenteController extends AbstractController
         return $this->render('admin/vente/index.html.twig', [
             'ventes' => $ventes,
             'query' => $query
+        ]);
+    }
+
+
+    #[Route('/impression', name: 'app_admin_vente_impression', methods: ['GET'])]
+    public function printProduit(VenteRepository $vr)
+    {
+        $ventes = $vr->findAll();
+        return $this->render('admin/vente/printVente.html.twig', [
+            'ventes' => $ventes
         ]);
     }
 }

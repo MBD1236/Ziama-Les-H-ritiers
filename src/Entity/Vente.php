@@ -26,9 +26,6 @@ class Vente
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $modePaiement = null;
-
-    #[ORM\Column(length: 255)]
     private ?string $statut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -99,16 +96,6 @@ class Vente
         return $this;
     }
 
-    public function getModePaiement(): ?string
-    {
-        return $this->modePaiement;
-    }
-
-    public function setModePaiement(string $modePaiement): static
-    {
-        $this->modePaiement = $modePaiement;
-        return $this;
-    }
 
     public function getStatut(): ?string
     {

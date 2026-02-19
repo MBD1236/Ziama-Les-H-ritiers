@@ -27,6 +27,7 @@
                     </form>
                 </div>
                 <div>
+                    <a type="button" href="{{ path('app_admin_client_impression') }}" class="btn btn-primary"><span class="bi bi-printer" title="Imprimer la liste"></span></a>
                     <a href="{{ path('app_admin_client_new')}}" class="btn btn-primary">Enregistrer un client</a>
                 </div>
             </div>
@@ -51,6 +52,9 @@
                                     <td>{{ c.telephone }}</td>
                                     <td>{{ c.typeClient }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
+                                            <a href="{{ path('app_admin_client_historique', {'id': c.id}) }}" 
+                                                class="btn btn-info btn-sm bi-clock-history" 
+                                                title="Historique d'achats"></a>
                                         <a href="{{ path('app_admin_client_edit', {'id': c.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
 

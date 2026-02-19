@@ -38,7 +38,6 @@
                                 <th>Nom</th>
                                 <th>Email</th>
                                 <th>Roles</th>
-                                <th>Mot de passe</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -49,7 +48,6 @@
                                     <td>{{ e.username }}</td>
                                     <td>{{ e.email }}</td>
                                     <td>{{ e.roles|join(', ') }}</td>
-                                    <td>{{ e.password }}</td>
                                     <td class="d-flex gap-2 justify-content-end w-100">
                                         <a href="{{ path('app_register_edit', {'id': e.id}) }}" class="btn btn-primary btn-sm bi-pencil"></a>
                                         <button  type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>

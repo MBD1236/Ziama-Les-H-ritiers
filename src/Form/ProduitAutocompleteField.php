@@ -23,7 +23,7 @@ class ProduitAutocompleteField extends AbstractType
                 },
                 'query_builder' => function (ProduitRepository $pr) {
                     return $pr->createQueryBuilder('p')
-                            ->where('p.nombrePack > 0');
+                            ->where('p.quantiteStock > 0');
                 },
         ]);
     }

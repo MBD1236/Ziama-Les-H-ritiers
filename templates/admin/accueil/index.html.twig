@@ -14,141 +14,305 @@
     </div>
 </div>
 {% endblock title %}
+
 {% block body %}
+
+{# FILTRE PÉRIODE #}
+<div class="row mb-3">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="card-body py-2">
+                <form method="GET" class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="fw-semibold text-muted"><i class="ri-calendar-line me-1"></i>Période d'analyse :</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="mb-0">Du</label>
+                        <input type="date" name="dateDebut" class="form-control form-control-sm" value="{{ dateDebut }}" style="width:160px">
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="mb-0">Au</label>
+                        <input type="date" name="dateFin" class="form-control form-control-sm" value="{{ dateFin }}" style="width:160px">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="ri-filter-line me-1"></i>Filtrer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# KPI FINANCIERS #}
+<div class="row">
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white;">
+            <div class="card-body">
+                <div class="float-end"><i class="ri-money-dollar-circle-line widget-icon" style="opacity:0.6"></i></div>
+                <h6 class="text-uppercase mt-0">Chiffre d'affaires</h6>
+                <h2 class="my-2">{{ chiffreAffaires|number_format(0, '.', ' ') }} GNF</h2>
+                <p class="mb-0" style="opacity:0.7"><small>{{ dateDebut }} → {{ dateFin }}</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color:white;">
+            <div class="card-body">
+                <div class="float-end"><i class="ri-funds-line widget-icon" style="opacity:0.6"></i></div>
+                <h6 class="text-uppercase mt-0">Bénéfice brut</h6>
+                <h2 class="my-2">{{ beneficeBrut|number_format(0, '.', ' ') }} GNF</h2>
+                <p class="mb-0" style="opacity:0.7"><small>CA - coût d'achat</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color:white;">
+            <div class="card-body">
+                <div class="float-end"><i class="ri-line-chart-line widget-icon" style="opacity:0.6"></i></div>
+                <h6 class="text-uppercase mt-0">Bénéfice net</h6>
+                <h2 class="my-2">{{ beneficeNet|number_format(0, '.', ' ') }} GNF</h2>
+                <p class="mb-0" style="opacity:0.7"><small>Bénéfice brut - charges</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card widget-flat" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color:white;">
+            <div class="card-body">
+                <div class="float-end"><i class="ri-bill-line widget-icon" style="opacity:0.6"></i></div>
+                <h6 class="text-uppercase mt-0">Total charges</h6>
+                <h2 class="my-2">{{ totalCharges|number_format(0, '.', ' ') }} GNF</h2>
+                <p class="mb-0" style="opacity:0.7"><small>Dépenses sur la période</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# KPI OPÉRATIONNELS #}
 <div class="row">
     <div class="col-xxl-3 col-sm-6">
         <div class="card widget-flat text-bg-purple">
             <div class="card-body">
-                <div class="float-end">
-                    <i class="ri-wallet-2-line widget-icon"></i>
-                </div>
-                <h6 class="text-uppercase mt-0" title="Customers">Caisse en GNF</h6>
-                <h2 class="my-2">{{ caisses }}</h2>
-                
+                <div class="float-end"><i class="ri-wallet-2-line widget-icon"></i></div>
+                <h6 class="text-uppercase mt-0">Etat de la caisse</h6>
+                <h2 class="my-2">{{ caisses|number_format(0, '.', ' ') }} GNF</h2>
             </div>
         </div>
-    </div> <!-- end col-->
-
+    </div>
     <div class="col-xxl-3 col-sm-6">
         <div class="card widget-flat text-bg-pink">
             <div class="card-body">
-                <div class="float-end">
-                    <i class="ri-briefcase-line widget-icon"></i>
-                </div>
+                <div class="float-end"><i class="ri-briefcase-line widget-icon"></i></div>
                 <div class="d-flex gap-3">
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Livraisons</h6>
+                        <h6 class="text-uppercase mt-0">Livraisons</h6>
                         <h2 class="my-2">{{ livraisons }}</h2>
                     </div>
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
+                        <h6 class="text-uppercase mt-0">Aujourd'hui</h6>
                         <h2 class="my-2">{{ nombreLivraisonParJour }}</h2>
                     </div>
                 </div>
             </div>
         </div>
-    </div> <!-- end col-->
-
+    </div>
     <div class="col-xxl-3 col-sm-6">
         <div class="card widget-flat text-bg-info">
             <div class="card-body">
-                <div class="float-end">
-                    <i class="ri-shopping-basket-line widget-icon"></i>
-                </div>
+                <div class="float-end"><i class="ri-shopping-basket-line widget-icon"></i></div>
                 <div class="d-flex gap-3">
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Ventes</h6>
+                        <h6 class="text-uppercase mt-0">Ventes</h6>
                         <h2 class="my-2">{{ ventes }}</h2>
                     </div>
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
+                        <h6 class="text-uppercase mt-0">Aujourd'hui</h6>
                         <h2 class="my-2">{{ nombreCommandeParJour }}</h2>
                     </div>
                 </div>
             </div>
         </div>
-    </div> <!-- end col-->
-
+    </div>
     <div class="col-xxl-3 col-sm-6">
-        <div class="card widget-flat text-bg-primary">
+        <div class="card widget-flat {% if nbProduitsEnRupture > 0 %}text-bg-danger{% else %}text-bg-primary{% endif %}">
             <div class="card-body">
-                <div class="float-end">
-                    <i class="ri-briefcase-2-line widget-icon"></i>
-                </div>
+                <div class="float-end"><i class="ri-briefcase-2-line widget-icon"></i></div>
                 <div class="d-flex gap-3">
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Produits</h6>
+                        <h6 class="text-uppercase mt-0">Produits</h6>
                         <h2 class="my-2">{{ produits }}</h2>
                     </div>
                     <div>
-                        <h6 class="text-uppercase mt-0" title="Customers">Aujourd'hui</h6>
-                        {# <h2 class="my-2">{{ nombreProductionParJour }}</h2> #}
+                        <h6 class="text-uppercase mt-0">⚠ Rupture</h6>
+                        <h2 class="my-2">{{ nbProduitsEnRupture }}</h2>
                     </div>
                 </div>
-                
             </div>
         </div>
-    </div> <!-- end col-->
+    </div>
 </div>
+
+{# ALERTE RUPTURE DE STOCK #}
+{% if produitsEnRupture|length > 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="ri-alarm-warning-line me-2"></i>
+                Produits bientôt en rupture de stock ({{ produitsEnRupture|length }})
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produit</th>
+                                <th>Catégorie</th>
+                                <th>Stock actuel</th>
+                                <th>Seuil d'alerte</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produit in produitsEnRupture %}
+                            <tr>
+                                <td><strong>{{ produit.nom }}</strong></td>
+                                <td>{{ produit.categorie ? produit.categorie.nom : '-' }}</td>
+                                <td>
+                                    <span class="badge {% if produit.quantiteStock == 0 %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                        {{ produit.quantiteStock }}
+                                    </span>
+                                </td>
+                                <td>{{ produit.seuilAlerte }}</td>
+                                <td>
+                                    {% if produit.quantiteStock == 0 %}
+                                        <span class="badge bg-danger">Rupture totale</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Stock faible</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# GRAPHIQUES chart + chart2 #}
 <div class="row">
     <div class="col-lg-6">
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
-            <h5 class="text-center mt-2">Nombre de ventes, production et livraisons</h5>
-        
+                <h5 class="text-center mt-2">Nombre de ventes par mois</h5>
             </div>
-            <div class="card-body">
-                {{ render_chart(chart) }}
-            </div>
+            <div class="card-body">{{ render_chart(chart) }}</div>
         </div>
-    </div> <!-- end col-->
+    </div>
     <div class="col-lg-6">
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
-            <h5 class="text-center mt-2">Somme des ventes, depenses et transaction fournisseurs</h5>
-        
+                <h5 class="text-center mt-2">CA vs Dépenses par mois (GNF)</h5>
             </div>
-            <div class="card-body">
-                {{ render_chart(chart2) }}
-
-            </div>
+            <div class="card-body">{{ render_chart(chart2) }}</div>
         </div>
-
-    </div> <!-- end col-->
+    </div>
 </div>
+
+{# GRAPHIQUE chart3 #}
 <div class="row">
     <div class="col-lg-12">
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
-                <h5 class="text-center mt-2">Somme des ventes, depenses et transaction fournisseurs</h5>
+                <h5 class="text-center mt-2">CA vs Dépenses annuels (5 ans)</h5>
             </div>
-            <div class="card-body">
-                {{ render_chart(chart3) }}
-            </div>
+            <div class="card-body">{{ render_chart(chart3) }}</div>
         </div>
     </div>
 </div>
+
+{# GRAPHIQUES chart4 (top produits) + chart5 (charges par type) #}
 <div class="row">
     <div class="col-lg-6">
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
-                <h5 class="text-center mt-2">Performance des livreurs par mois</h5>
+                <h5 class="text-center mt-2">Top 5 produits les plus vendus</h5>
             </div>
-            <div class="card-body">
-                {{ render_chart(chart4) }}
-            </div>
+            <div class="card-body">{{ render_chart(chart4) }}</div>
         </div>
     </div>
     <div class="col-lg-6">
         <div class="card card-box" style="height: 500px;">
             <div class="card-head">
-                <h5 class="text-center mt-2">Performance des livreurs par année</h5>
+                <h5 class="text-center mt-2">Répartition des charges par type</h5>
             </div>
-            <div class="card-body">
-                {{ render_chart(chart5) }}
+            <div class="card-body">{{ render_chart(chart5) }}</div>
+        </div>
+    </div>
+</div>
+
+{# GRAPHIQUES chart6 (ventes par catégorie) + chart7 (livreurs) #}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+                <h5 class="text-center mt-2">Ventes par catégorie</h5>
+            </div>
+            <div class="card-body">{{ render_chart(chart6) }}</div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-box" style="height: 500px;">
+            <div class="card-head">
+                <h5 class="text-center mt-2">Performance des livreurs (mois / année)</h5>
+            </div>
+            <div class="card-body">{{ render_chart(chart7) }}</div>
+        </div>
+    </div>
+</div>
+
+{# TABLEAU TOP 5 PRODUITS #}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="ri-trophy-line me-2"></i>Détail — Top 5 produits les plus vendus</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Produit</th>
+                            <th>Quantité vendue</th>
+                            <th>CA généré (GNF)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i, p in topProduits %}
+                        <tr>
+                            <td>
+                                {% if i == 0 %}🥇
+                                {% elseif i == 1 %}🥈
+                                {% elseif i == 2 %}🥉
+                                {% else %}<span class="text-muted">{{ i + 1 }}</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ p.produit }}</strong></td>
+                            <td>{{ p.totalQuantite }}</td>
+                            <td>{{ p.totalCA|number_format(0, '.', ' ') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">Aucune donnée disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-<!-- end row -->
+
 {% endblock body %}

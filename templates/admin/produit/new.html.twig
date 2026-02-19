@@ -22,7 +22,17 @@
                 <h4 class="header-title">Ajout d'un produit</h4>
             </div>
             <div class="card-body">
-                {{form(form)}}
+                {{form_start(form)}}
+                <div class="row">
+                    <div class="col-md-6">{{ form_row(form.nom) }}</div>
+                    <div class="col-md-6">{{ form_row(form.categorie) }}</div>
+                    <div class="col-md-6">{{ form_row(form.prixAchat) }}</div>
+                    <div class="col-md-6">{{ form_row(form.prixVente) }}</div>
+                    <div class="col-md-6">{{ form_row(form.quantiteStock) }}</div>
+                    <div class="col-md-6">{{ form_row(form.seuilAlerte) }}</div>
+                    <div class="col-md-6">{{ form_row(form.save) }}</div>
+                </div>
+                {{form_end(form)}}
             </div>
         </div>
     </div>

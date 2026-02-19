@@ -57,10 +57,6 @@
                                 <td>{{ vente.dateVente|date('d/m/Y à H:i') }}</td>
                             </tr>
                             <tr>
-                                <th>Mode de paiement:</th>
-                                <td><span class="badge bg-secondary">{{ vente.modePaiement }}</span></td>
-                            </tr>
-                            <tr>
                                 <th>Statut:</th>
                                 <td>
                                     {% if vente.statut == 'Non réglé' %}
@@ -90,7 +86,7 @@
                                     <th>#</th>
                                     <th>Produit</th>
                                     <th class="text-center">Quantité</th>
-                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Prix vente</th>
                                     <th class="text-end">Total ligne</th>
                                 </tr>
                             </thead>
@@ -104,9 +100,9 @@
                                         <td class="text-center">
                                             <span class="badge bg-info">{{ ligne.quantite }}</span>
                                         </td>
-                                        <td class="text-end">{{ ligne.prixUnitaire|number_format(0, ',', ' ') }} GNF</td>
+                                        <td class="text-end">{{ ligne.produit.prixVente|number_format(0, ',', ' ') }} GNF</td>
                                         <td class="text-end fw-bold">
-                                            {{ (ligne.totalLigne ?? (ligne.prixUnitaire * ligne.quantite))|number_format(0, ',', ' ') }} GNF
+                                            {{ (ligne.totalLigne ?? (ligne.produit.prixVente * ligne.quantite))|number_format(0, ',', ' ') }} GNF
                                         </td>
                                     </tr>
                                 {% endfor %}

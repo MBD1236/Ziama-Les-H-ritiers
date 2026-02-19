@@ -23,6 +23,8 @@ class ReglementFactureType extends AbstractType
                 'choices' => [
                     'Sélectionner le mode de réglement' => null,
                     'Espèces' => 'Espèces',
+                    'Orange money' => 'Orange money',
+                    'Mobile money' => 'Mobile money'
                 ],
             ])
             ->add('montantRegle', IntegerType::class, [

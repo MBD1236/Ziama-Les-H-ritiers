@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Form\ClientType;
 use App\Repository\ClientRepository;
+use App\Repository\VenteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/client')]
 class ClientController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_client_index', methods:['GET'])]
+    #[Route('/', name: 'app_admin_client_index', methods: ['GET'])]
     public function index(Request $request, ClientRepository $clientRepository): Response
     {
         $page = $request->query->getInt('page', 1);
@@ -23,15 +24,14 @@ class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_admin_client_new', methods:['GET', 'POST'])]
+    #[Route('/new', name: 'app_admin_client_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $client = new Client();
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($client);
             $em->flush();
             $this->addFlash('success', 'Le client a été bien enregistrée.');
@@ -42,14 +42,32 @@ class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_admin_client_edit', methods:['GET', 'POST'])]
-    public function edit(Client $client,Request $request, EntityManagerInterface $em): Response
+    #[Route('/{id}/historique', name: 'app_admin_client_historique', methods: ['GET'])]
+    public function historique(
+        Client $client,
+        VenteRepository $venteRepository,
+        ClientRepository $clientRepository
+    ): Response {
+        $ventes       = $venteRepository->findByClient($client);
+        $montantTotal = $clientRepository->getMontantTotalClient($client);
+        $nombreVentes = count($ventes);
+
+        return $this->render('admin/client/historique.html.twig', [
+            'client'       => $client,
+            'ventes'       => $ventes,
+            'montantTotal' => $montantTotal,
+            'nombreVentes' => $nombreVentes,
+            'dateDebut'    => '',
+            'dateFin'      => '',
+        ]);
+    }
+    #[Route('/{id}/edit', name: 'app_admin_client_edit', methods: ['GET', 'POST'])]
+    public function edit(Client $client, Request $request, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(ClientType::class, $client);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
             $this->addFlash('success', 'Le client a été bien modifié.');
             return $this->redirectToRoute('app_admin_client_index');
@@ -62,26 +80,39 @@ class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_admin_client_delete', methods: ['DELETE'])]
     public function delete(Client $client, EntityManagerInterface $em): Response
     {
-        $em->remove($client);
-        $em->flush();
-        $this->addFlash('success', 'Le client a bien été supprimé.');
-        return $this->redirectToRoute('app_admin_client_index');
+        try {
+            $em->remove($client);
+            $em->flush();
+            $this->addFlash('success', 'Le client a bien été supprimé.');
+            return $this->redirectToRoute('app_admin_client_index');
+        } catch (\Throwable $th) {
+           $this->addFlash('danger', 'Erreur de suppression du client.');
+            return $this->redirectToRoute('app_admin_client_index');
+        }
     }
 
-    #[Route('/search', name: 'app_admin_client_search', methods:['GET'])]
+    #[Route('/search', name: 'app_admin_client_search', methods: ['GET'])]
     public function search(Request $request, ClientRepository $clientRepository): Response
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query or $query == '')
-        {
+        if ($query or $query == '') {
             $clients = $clientRepository->paginateWithSearch($query, $page);
-        }else{
+        } else {
             $clients = [];
         }
         return $this->render('admin/client/index.html.twig', [
             'clients' => $clients,
             'query' => $query
+        ]);
+    }
+
+    #[Route('/impression', name: 'app_admin_client_impression', methods: ['GET'])]
+    public function printClient(ClientRepository $cr)
+    {
+        $clients = $cr->findAll();
+        return $this->render('admin/client/printClient.html.twig', [
+            'clients' => $clients
         ]);
     }
 }

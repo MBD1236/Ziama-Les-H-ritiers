@@ -25,8 +25,8 @@ class AppFixtures extends Fixture
 
         // Employé 1
         $employe1 = new User();
-        $employe1->setUsername('Marie Dupont')
-                ->setEmail('marie.dupont@ziama.com')
+        $employe1->setUsername('kallo')
+                ->setEmail('kallo@ziama.com')
                 ->setPassword($this->hasher->hashPassword($employe1, 'password123'))
                 ->setRoles(['ROLE_EMPLOYE']);
         $manager->persist($employe1);

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Groupe Mandela</title>
+    <title>Ziama Les Héritiers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully responsive admin theme which can be used to build CRM, CMS,ERP etc." name="description" />
     <meta content="Techzaa" name="author" />
@@ -29,7 +29,7 @@
                             <div class="col-lg-6">
                                 <div class="d-flex flex-column h-100">
                                     <div class="auth-brand p-4">
-                                        <h1> GROUPE MANDELA</h1>
+                                        <h2> ZIAMA LES HERITIERS</h2>
                                         {% if error %}
                                             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                                         {% endif %}
@@ -59,12 +59,6 @@
                                                 <label for="password" class="form-label">Mot de passe</label>
                                                 <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required placeholder="Enter your password">
                                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input type="checkbox" name="_remember_me" id="_remember_me">
-                                                    <label for="_remember_me">Se souvenir de moi</label>
-                                                </div>
                                             </div>
                                             <div class="mb-0 text-start">
                                                 <button class="btn btn-soft-primary w-100" type="submit"><i

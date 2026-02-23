@@ -69,6 +69,17 @@ class ProduitType extends AbstractType
                     new GreaterThanOrEqual(['value' => 0, 'message' => 'La quantité doit être positive'])
                 ]
             ])
+            ->add('nombreParCasier', IntegerType::class, [
+                'label' => 'Nombre produit par casier',
+                'required' => true,
+                'attr' => [
+                    'min' => 0,
+                    'placeholder' => '1'
+                ],
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0, 'message' => 'Le nombre du produit par casier doit être positive'])
+                ]
+            ])
             ->add('seuilAlerte', IntegerType::class, [
                 'label' => 'Seuil d\'alerte',
                 'required' => true,

@@ -28,7 +28,17 @@
                     <div class="col-md-6">{{ form_row(form.categorie) }}</div>
                     <div class="col-md-6">{{ form_row(form.prixAchat) }}</div>
                     <div class="col-md-6">{{ form_row(form.prixVente) }}</div>
-                    <div class="col-md-6">{{ form_row(form.quantiteStock) }}</div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.quantiteStock) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.nombreParCasier) }}
+                            </div>
+                        </div>
+
+                    </div>
                     <div class="col-md-6">{{ form_row(form.seuilAlerte) }}</div>
                     <div class="col-md-6">{{ form_row(form.save) }}</div>
                 </div>

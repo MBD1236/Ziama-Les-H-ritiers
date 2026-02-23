@@ -35,7 +35,16 @@
                         <td>{{ produit.categorie.nom }}</td>
                         <td>{{ produit.prixAchat }}</td>
                         <td>{{ produit.prixVente }}</td>
-                        <td>{{ produit.quantiteStock }}</td>
+                        <td>
+                                    {% if produit.nombreParCasier and produit.nombreParCasier > 0 %}
+                                        {{ produit.quantiteStock }} bouteilles
+                                        <span class="badge bg-info">
+                                            {{ (produit.quantiteStock / produit.nombreParCasier)|round(1) }} casier(s)
+                                        </span>
+                                    {% else %}
+                                        {{ produit.quantiteStock }}
+                                    {% endif %}
+                                    </td>
                         <td>{{ produit.seuilAlerte }}</td>
                     </tr>
                     {% endfor %}

@@ -32,12 +32,16 @@ class Produit
 
     #[ORM\Column]
     private ?int $seuilAlerte = null;
-
+    
+    #[ORM\Column]
+    private ?int $nombreParCasier = null;
+    
     /**
      * @var Collection<int, MouvementStock>
      */
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'produit')]
     private Collection $mouvementStocks;
+
 
     public function __construct()
     {
@@ -154,5 +158,17 @@ class Produit
     public function __toString(): string
     {
         return $this->nom ?? '';
+    }
+
+    public function getNombreParCasier(): ?int
+    {
+        return $this->nombreParCasier;
+    }
+
+    public function setNombreParCasier(int $nombreParCasier): static
+    {
+        $this->nombreParCasier = $nombreParCasier;
+
+        return $this;
     }
 }

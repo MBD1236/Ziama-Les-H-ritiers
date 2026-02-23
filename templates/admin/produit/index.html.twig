@@ -55,7 +55,17 @@
                                     <td>{{ b.categorie.nom }}</td>
                                     <td>{{ b.prixAchat }} GNF</td>
                                     <td>{{ b.prixVente }} GNF</td>
-                                    <td class="fw-bold">{{ b.quantiteStock }}</td>
+                                    
+                                    <td>
+                                    {% if b.nombreParCasier and b.nombreParCasier > 0 %}
+                                        {{ b.quantiteStock }} bouteilles
+                                        <span class="badge bg-info">
+                                            {{ (b.quantiteStock / b.nombreParCasier)|round(1) }} casier(s)
+                                        </span>
+                                    {% else %}
+                                        {{ b.quantiteStock }}
+                                    {% endif %}
+                                    </td>
                                     <td>{{ b.seuilAlerte }}</td>
                                     {% if b.quantiteStock < b.seuilAlerte %}
                                         <td><span class="badge bg-danger">Alerte</span></td>

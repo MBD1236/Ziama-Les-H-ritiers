@@ -54,19 +54,11 @@ class MouvementStockRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // src/Repository/MouvementStockRepository.php
-
     public function findMouvementsByVente(Vente $vente): array
     {
         return $this->createQueryBuilder('m')
-            ->innerJoin('m.produit', 'p')
-            ->innerJoin('App\Entity\LigneVente', 'l', 'WITH', 'l.produit = p')
-            ->where('l.vente = :vente')
-            ->andWhere('m.typeMouvement = :type')
-            ->andWhere('m.date >= :dateVente') // Sécurité : seulement après la vente
-            ->setParameter('vente', $vente)
-            ->setParameter('type', 'sortie')
-            ->setParameter('dateVente', $vente->getDateVente())
+            ->where('m.typeMouvement LIKE :type')
+            ->setParameter('type', 'Vente#' . $vente->getId() . '%')
             ->getQuery()
             ->getResult();
     }

@@ -1,0 +1,106 @@
+{% extends "admin/base.html.twig" %}
+{% block title %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);"><i class="ri-home-4-line me-1"></i>Accueil</a></li>
+                    <li class="breadcrumb-item active">Pertes de stock</li>
+                </ol>
+            </div>
+            <h4 class="page-title">Pertes de stock</h4>
+        </div>
+    </div>
+</div>
+{% endblock title %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        {% include "admin/partials/_flash.html.twig" %}
+        <div class="card">
+            <div class="d-flex justify-content-between mx-3 pt-2 gap-2 align-items-center">
+                <h5 class="mb-0">Liste des pertes enregistrées</h5>
+                <a href="{{ path('app_admin_perte_stock_new') }}" class="btn btn-primary">
+                    Enregistrer une perte
+                </a>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th>N°</th>
+                            <th>Produit</th>
+                            <th>Quantité perdue</th>
+                            <th>Motif</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Enregistré par</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k, perte in pertes %}
+                        <tr class="text-center">
+                            <td>{{ k+1 }}</td>
+                            <td>{{ perte.produit.nom }}</td>
+                            <td>
+                                <span class="badge bg-danger">{{ perte.quantite }}</span>
+                            </td>
+                            <td>
+                                {% if perte.motif == 'Périmé' %}
+                                    <span class="badge bg-warning text-dark">{{ perte.motif }}</span>
+                                {% elseif perte.motif == 'Avarié' %}
+                                    <span class="badge bg-orange text-dark">{{ perte.motif }}</span>
+                                {% elseif perte.motif == 'Cassé' %}
+                                    <span class="badge bg-secondary">{{ perte.motif }}</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ perte.motif }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ perte.description ?? '-' }}</td>
+                            <td>{{ perte.date|date('d/m/Y H:i') }}</td>
+                            <td>{{ perte.user ? perte.user.username : '-' }}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm bi-trash"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#delete-modal-{{ k }}">
+                                </button>
+
+                                <!-- Modal suppression -->
+                                <div id="delete-modal-{{ k }}" class="modal fade" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-sm">
+                                        <div class="modal-content modal-filled bg-danger">
+                                            <div class="modal-body p-4">
+                                                <div class="text-center">
+                                                    <i class="ri-close-circle-line h1"></i>
+                                                    <h4 class="mt-2">Suppression!</h4>
+                                                    <p class="mt-3">Voulez-vous annuler cette perte ? Le stock sera restauré.</p>
+                                                    <form action="{{ path('app_admin_perte_stock_delete', {'id': perte.id}) }}" method="post">
+                                                        <input type="hidden" name="_method" value="POST">
+                                                        <button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Non</button>
+                                                        <button type="submit" class="btn btn-light">Oui</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="ri-inbox-line" style="font-size:2rem"></i>
+                                <p class="mt-2">Aucune perte enregistrée.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

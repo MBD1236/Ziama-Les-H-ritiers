@@ -42,10 +42,17 @@ class Produit
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'produit')]
     private Collection $mouvementStocks;
 
+    /**
+     * @var Collection<int, PerteStock>
+     */
+    #[ORM\OneToMany(targetEntity: PerteStock::class, mappedBy: 'produit')]
+    private Collection $perteStocks;
+
 
     public function __construct()
     {
         $this->mouvementStocks = new ArrayCollection();
+        $this->perteStocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -168,6 +175,36 @@ class Produit
     public function setNombreParCasier(int $nombreParCasier): static
     {
         $this->nombreParCasier = $nombreParCasier;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PerteStock>
+     */
+    public function getPerteStocks(): Collection
+    {
+        return $this->perteStocks;
+    }
+
+    public function addPerteStock(PerteStock $perteStock): static
+    {
+        if (!$this->perteStocks->contains($perteStock)) {
+            $this->perteStocks->add($perteStock);
+            $perteStock->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerteStock(PerteStock $perteStock): static
+    {
+        if ($this->perteStocks->removeElement($perteStock)) {
+            // set the owning side to null (unless already changed)
+            if ($perteStock->getProduit() === $this) {
+                $perteStock->setProduit(null);
+            }
+        }
 
         return $this;
     }

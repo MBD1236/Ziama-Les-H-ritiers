@@ -50,10 +50,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Livraison::class, mappedBy: 'user')]
     private Collection $livraisons;
 
+    /**
+     * @var Collection<int, PerteStock>
+     */
+    #[ORM\OneToMany(targetEntity: PerteStock::class, mappedBy: 'user')]
+    private Collection $perteStocks;
+
     public function __construct()
     {
         $this->ventes = new ArrayCollection();
         $this->livraisons = new ArrayCollection();
+        $this->perteStocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,6 +203,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($livraison->getUser() === $this) {
                 $livraison->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PerteStock>
+     */
+    public function getPerteStocks(): Collection
+    {
+        return $this->perteStocks;
+    }
+
+    public function addPerteStock(PerteStock $perteStock): static
+    {
+        if (!$this->perteStocks->contains($perteStock)) {
+            $this->perteStocks->add($perteStock);
+            $perteStock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerteStock(PerteStock $perteStock): static
+    {
+        if ($this->perteStocks->removeElement($perteStock)) {
+            // set the owning side to null (unless already changed)
+            if ($perteStock->getUser() === $this) {
+                $perteStock->setUser(null);
             }
         }
 

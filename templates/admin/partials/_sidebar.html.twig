@@ -210,6 +210,28 @@
             </li>
             {% endif %}
 
+            {# Pertes de stock — Admin seulement #}
+            
+            {% if is_granted('ROLE_ADMIN') %}
+            <li class="side-nav-item">
+                <a data-bs-toggle="collapse" href="#sidebarPagesPerteStock" aria-expanded="false" aria-controls="sidebarPagesPerteStock" class="side-nav-link">
+                    <i class="ri-alert-line"></i>
+                    <span>Pertes de stock</span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="sidebarPagesPerteStock">
+                    <ul class="side-nav-second-level">
+                        <li>
+                            <a href="{{ path('app_admin_perte_stock_new') }}">Enregistrer une perte</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_admin_perte_stock_index') }}">Liste des pertes</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+
         </ul>
 
         <div class="clearfix"></div>

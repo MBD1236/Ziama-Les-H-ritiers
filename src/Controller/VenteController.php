@@ -172,7 +172,7 @@ class VenteController extends AbstractController
             // Créer le mouvement de stock
             $mouvement = new MouvementStock();
             $mouvement->setProduit($ligne->getProduit());
-            $mouvement->setTypeMouvement('sortie');
+            $mouvement->setTypeMouvement('Vente#' . $vente->getId() . ' - sortie');
             $mouvement->setQuantite($ligne->getQuantite());
             $mouvement->setDate(new DateTime());
 

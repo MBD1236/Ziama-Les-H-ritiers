@@ -36,16 +36,11 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
             $type = $form->get('type')->getData();
-            if($type == 'Administrateur'){
+            if ($type == 'Administrateur') {
                 $user->setRoles(["ROLE_ADMIN"]);
-            }elseif($type == 'Producteur'){
-                $user->setRoles(["ROLE_PRODUCTEUR"]);
-            }elseif($type == 'Livreur'){
-                $user->setRoles(["ROLE_LIVREUR"]);
-            }elseif($type == 'Comptable'){
-                $user->setRoles(["ROLE_COMPTABLE"]);
+            } elseif ($type == 'Employe') {
+                $user->setRoles(["ROLE_EMPLOYE"]);
             }
-
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
@@ -73,14 +68,10 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
             $type = $form->get('type')->getData();
-            if($type == 'Administrateur'){
+            if ($type == 'Administrateur') {
                 $user->setRoles(["ROLE_ADMIN"]);
-            }elseif($type == 'Producteur'){
-                $user->setRoles(["ROLE_PRODUCTEUR"]);
-            }elseif($type == 'Livreur'){
-                $user->setRoles(["ROLE_LIVREUR"]);
-            }elseif($type == 'Comptable'){
-                $user->setRoles(["ROLE_COMPTABLE"]);
+            } elseif ($type == 'Employe') {
+                $user->setRoles(["ROLE_EMPLOYE"]);
             }
 
             // encode the plain password
@@ -99,7 +90,7 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_register_delete', methods:['DELETE'])]
+    #[Route('/{id}', name: 'app_register_delete', methods: ['DELETE'])]
     public function delete(Request $request, User $user, EntityManagerInterface $em): Response
     {
         $em->remove($user);
@@ -108,15 +99,14 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_employe_index');
     }
 
-    #[Route('/search', name: 'app_register_search', methods:['GET'])]
+    #[Route('/search', name: 'app_register_search', methods: ['GET'])]
     public function search(Request $request, UserRepository $userRepository): Response
     {
         $query = $request->query->get('recherche');
         $page = $request->query->getInt('page', 1);
-        if ($query or $query == '')
-        {
+        if ($query or $query == '') {
             $employes = $userRepository->paginateWithSearch($query, $page);
-        }else{
+        } else {
             $emoloyes = [];
         }
         return $this->render('registration/index.html.twig', [

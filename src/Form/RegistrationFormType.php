@@ -30,9 +30,7 @@ class RegistrationFormType extends AbstractType
                 'choices' => [
                     'Sélectionner le type d\'employé' => null,
                     'Administrateur' => 'Administrateur',
-                    'Producteur' => 'Producteur',
-                    'Livreur' => 'Livreur',
-                    'Comptable' => 'Comptable',
+                    'Employe' => 'Employe',
                 ],
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],

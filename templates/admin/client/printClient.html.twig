@@ -2,15 +2,20 @@
 {% block body %}
 
 <div class="container mt-5 border p-4 card">
-    <!-- En-tête -->
-    <div class="row text-center">
-        <div class="col-12">
+    <!-- En-tête avec logo -->
+    <div class="row text-center align-items-center mb-2">
+        <div class="col-3 text-start">
+            <img src="{{ asset('admin/images/login.jpg') }}" alt="Logo Ziama" style="width: 100px; height: 100px; object-fit: contain;">
+        </div>
+        <div class="col-6">
             <h3 class="text-primary fw-bold">LISTE DES CLIENTS</h3>
-            <h4 class="fw-bold">Ziama Les Héritiers</h4>
+            <h4 class="fw-bold">ETS. Ziama Les Héritiers</h4>
             <p>Contact : 625556078</p>
         </div>
+        <div class="col-3 text-end">
+            <img src="{{ asset('admin/images/login.jpg') }}" alt="Logo Ziama" style="width: 100px; height: 100px; object-fit: contain;">
+        </div>
     </div>
-
 
     <!-- Tableau des produits -->
     <div class="row mt-2">

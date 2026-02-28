@@ -37,8 +37,9 @@ class ClientType extends AbstractType
                 'required' => true,
                 'choices' => [
                     'Sélectionner le type du client' => null,
-                    'Particulier' => 'Particulier',
-                    'Revendeur' => 'Revendeur',
+                    'Grossiste' => 'Grossiste',
+                    'Demi-grossiste' => 'Demi-grossiste',
+                    'Détaillant' => 'Détaillant',
                 ],
             ])
             ->add('save', SubmitType::class, [

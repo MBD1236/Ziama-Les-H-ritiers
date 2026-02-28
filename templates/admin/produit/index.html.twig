@@ -28,7 +28,9 @@
                 </div>
                 <div>
                     <a type="button" href="{{ path('app_admin_produit_impression') }}" class="btn btn-primary"><span class="bi bi-printer" title="Imprimer la liste"></span></a>
+                {% if is_granted('ROLE_ADMIN') %}
                     <a href="{{ path('app_admin_produit_new')}}" class="btn btn-primary">Enregistrer un produit</a>
+                {% endif %}
                 </div>
 
             </div>
@@ -75,10 +77,16 @@
                                         <td><span class="badge bg-success">Bon</span></td>
                                     {% endif %}
                                     <td class="d-flex justify-content-center gap-2 align-items-center">
-                                        <a href="{{ path('app_admin_produit_edit', {'id': b.id}) }}" class="btn btn-primary btn-sm bi-pencil" title="Modifier ce produit"></a>
-                                        <button type="button" class="btn btn-primary btn-sm" title="Augmenter le stock" data-bs-toggle="modal" data-bs-target="#primary-header-modal-{{ k }}">Stock</button>
-                                        <a href="{{ path('app_admin_produit_mouvement_produit', {'id': b.id}) }}" class="btn btn-primary btn-sm bi-eye" title="Voir les mouvements"></a>
-                                        <button type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
+                                         {% if is_granted('ROLE_ADMIN') %}
+                                         <a href="{{ path('app_admin_produit_edit', {'id': b.id}) }}" class="btn btn-primary btn-sm bi-pencil" title="Modifier ce produit"></a>
+                                         <button type="button" class="btn btn-primary btn-sm" title="Augmenter le stock" data-bs-toggle="modal" data-bs-target="#primary-header-modal-{{ k }}">Stock</button>
+                                         <button type="button" class="btn btn-danger btn-sm bi-trash" data-bs-toggle="modal" data-bs-target="#danger-alert-modal-{{ k }}"></button>
+                                         {% endif %}
+
+                                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYE') %}
+                                         <a href="{{ path('app_admin_produit_mouvement_produit', {'id': b.id}) }}" class="btn btn-primary btn-sm bi-eye" title="Voir les mouvements"></a>
+                                         {% endif %}
+
 
 
                                         <!-- Danger Alert Modal -->

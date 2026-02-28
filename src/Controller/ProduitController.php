@@ -36,6 +36,8 @@ class ProduitController extends AbstractController
     #[Route('/new', name: 'app_admin_produit_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, CaisseRepository $caisseRepository): Response
     {
+         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $produit = new Produit();
         $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
@@ -187,6 +189,7 @@ class ProduitController extends AbstractController
         LigneVenteRepository $ligneVenteRepository
     ): Response {
         try {
+             $this->denyAccessUnlessGranted('ROLE_ADMIN');
             // Bloquer si le produit a des ventes associées
             $lignes = $ligneVenteRepository->findBy(['produit' => $produit]);
             if (count($lignes) > 0) {
@@ -234,6 +237,7 @@ class ProduitController extends AbstractController
     #[Route('/{id}/ajout-stock', name: 'app_admin_produit_ajout_stock', methods: ['POST'])]
     public function ajoutStock(Produit $produit, Request $request, EntityManagerInterface $em, CaisseRepository $caisseRepository): Response
     {
+         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         /* Je recupere les valeurs du formulaire */
         $quantite = (int)$request->request->get('quantite');
         $date = new DateTime();

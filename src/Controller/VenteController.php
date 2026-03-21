@@ -86,10 +86,13 @@ class VenteController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $prixVente = $ligne->getPrixVente();
+            $seuilPrixVente = $ligne->getProduit()->getPrixVente();
+
             $ligne->setVente($vente);
             $ligne->setProduit($ligne->getProduit());
             $ligne->setQuantite($ligne->getQuantite());
-            $ligne->setTotalLigne($ligne->getQuantite() * $ligne->getProduit()->getPrixVente());
+            $ligne->setTotalLigne($ligne->getQuantite() * $prixVente);
 
             // Vérifier le stock
             $produit = $ligne->getProduit();
@@ -100,6 +103,15 @@ class VenteController extends AbstractController
                     'danger',
                     'Stock insuffisant pour ' . $produit->getNom() .
                         ' (disponible: ' . $stockActuel . ')'
+                );
+                return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
+            }
+
+            // Vérifier le prix de vente
+            if ($prixVente < $seuilPrixVente) {
+                $this->addFlash(
+                    'danger',
+                    'Le prix de vente est inférieur au seuil du prix de vente'
                 );
                 return $this->redirectToRoute('app_admin_vente_add_lignes', ['id' => $vente->getId()]);
             }
@@ -244,7 +256,7 @@ class VenteController extends AbstractController
         // Calculer le montant total
         $montantTotal = 0;
         foreach ($vente->getLignes() as $ligne) {
-            $montantTotal += $ligne->getTotalLigne() ?? ($ligne->getProduit()->getPrixVente() * $ligne->getQuantite());
+            $montantTotal += $ligne->getTotalLigne() ?? ($ligne->getPrixVente() * $ligne->getQuantite());
         }
 
         return $this->render('admin/vente/show.html.twig', [

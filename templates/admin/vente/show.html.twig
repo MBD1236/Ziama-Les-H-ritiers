@@ -100,9 +100,9 @@
                                         <td class="text-center">
                                             <span class="badge bg-info">{{ ligne.quantite }}</span>
                                         </td>
-                                        <td class="text-end">{{ ligne.produit.prixVente|number_format(0, ',', ' ') }} GNF</td>
+                                        <td class="text-end">{{ ligne.prixVente|number_format(0, ',', ' ') }} GNF</td>
                                         <td class="text-end fw-bold">
-                                            {{ (ligne.totalLigne ?? (ligne.produit.prixVente * ligne.quantite))|number_format(0, ',', ' ') }} GNF
+                                            {{ (ligne.totalLigne ?? (ligne.prixVente * ligne.quantite))|number_format(0, ',', ' ') }} GNF
                                         </td>
                                     </tr>
                                 {% endfor %}

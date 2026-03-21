@@ -28,6 +28,9 @@ class LigneVente
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $totalLigne = null;
 
+    #[ORM\Column(nullable: false)]
+    private ?int $prixVente = null;
+
 
 
     public function getId(): ?int
@@ -77,6 +80,18 @@ class LigneVente
     public function setTotalLigne(int $totalLigne): static
     {
         $this->totalLigne = $totalLigne;
+        return $this;
+    }
+
+    public function getPrixVente(): ?int
+    {
+        return $this->prixVente;
+    }
+
+    public function setPrixVente(?int $prixVente): static
+    {
+        $this->prixVente = $prixVente;
+
         return $this;
     }
 

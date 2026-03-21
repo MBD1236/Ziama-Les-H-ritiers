@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
 class LigneVenteType extends AbstractType
 {
@@ -18,6 +19,17 @@ class LigneVenteType extends AbstractType
             ->add('produit', ProduitAutocompleteField::class, [
                 'label' => 'Produit',
                 'required' => true
+            ])
+            ->add('prixVente', IntegerType::class, [
+                'label' => 'Prix de vente (GNF)',
+                'required' => true,
+                'attr' => [
+                    'min' => 0,
+                    'placeholder' => '0'
+                ],
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0, 'message' => 'Le prix de vente doit être positif'])
+                ]
             ])
             ->add('quantite', IntegerType::class, [
                 'label' => 'Quantité',

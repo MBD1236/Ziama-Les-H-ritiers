@@ -33,14 +33,16 @@
                         <h5><i class="ri-add-line"></i> Ajouter une ligne</h5>
                         {{ form_start(form) }}
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     {{ form_row(form.produit) }}
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6">
+                                    {{ form_row(form.prixVente) }}
+                                </div>
+                                <div class="col-md-6">
                                     {{ form_row(form.quantite) }}
                                 </div>
-                                <div class="col-md-3" style="padding-top: 6.5px !important;">
-                                    <label>&nbsp;</label>
+                                <div class="col-md-3">
                                     <button type="submit" class="btn btn-success w-100">
                                         <i class="ri-check-line"></i> Ajouter
                                     </button>
@@ -71,7 +73,7 @@
                                     <tr>
                                         <td>{{ ligne.produit.nom }}</td>
                                         <td>{{ ligne.quantite }}</td>
-                                        <td>{{ ligne.produit.prixVente|number_format(0, ',', ' ') }} GNF</td>
+                                        <td>{{ ligne.prixVente|number_format(0, ',', ' ') }} GNF</td>
                                         <td>{{ ligne.totalLigne|number_format(0, ',', ' ') }} GNF</td>
                                         <td>
                                             <form method="post" 

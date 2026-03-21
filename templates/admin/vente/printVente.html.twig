@@ -44,7 +44,7 @@
                         {# Montant total (somme de toutes les lignes) #}
                         {% set montant = 0 %}
                         {% for ligne in vente.lignes %}
-                            {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.produit.prixVente * ligne.quantite)) %}
+                            {% set montant = montant + (ligne.totalLigne ? ligne.totalLigne : (ligne.prixVente * ligne.quantite)) %}
                         {% endfor %}
                         <td class="fw-bold">{{ montant|number_format(0, ',', ' ') }} GNF</td>
                         <td>{{ vente.statut }}</td>
